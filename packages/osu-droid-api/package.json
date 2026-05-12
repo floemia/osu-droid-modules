@@ -1,0 +1,22 @@
+{
+  "name": "@floemia/osu-droid-api",
+  "version": "1.0.0",
+  "description": "A basic wrapper for the osu!droid Public API, written in TypeScript.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --clean"
+  },
+  "keywords": [
+    "osu",
+    "osu-droid",
+    "api",
+    "api-wrapper"
+  ],
+  "author": "floemia",
+  "license": "ISC",
+  "type": "commonjs",
+  "files": [
+    "dist"
+  ]
+}

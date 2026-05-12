@@ -1,0 +1,23 @@
+{
+  "name": "@floemia/osudroid.js",
+  "version": "1.0.0",
+  "description": "An unofficial module that allows you to interact with the osu!droid API with ease, and more.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --clean"
+  },
+  "keywords": [],
+  "author": "floemia",
+  "license": "ISC",
+  "type": "commonjs",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@floemia/osu-droid-api": "^1.0.0",
+    "@rian8337/osu-base": "^4.0.0-beta.87",
+    "@rian8337/osu-difficulty-calculator": "^4.0.0-beta.87",
+    "@rian8337/osu-droid-replay-analyzer": "^4.0.0-beta.87"
+  }
+}
