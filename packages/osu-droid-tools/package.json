@@ -1,6 +1,6 @@
 {
   "name": "@floemia/osu-droid-tools",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A module that turns osu!droid Public API responses into functional TypeScript instances.",
   "homepage": "https://github.com/floemia/osu-droid-modules/tree/master/packages/osu-droid-tools",
   "main": "dist/index.js",
@@ -26,7 +26,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@floemia/osu-droid-api": "^0.0.5",
+    "@floemia/osu-droid-api": "^0.0.6",
     "@rian8337/osu-base": "^4.0.0-beta.87",
     "@rian8337/osu-difficulty-calculator": "^4.0.0-beta.87",
     "@rian8337/osu-droid-replay-analyzer": "^4.0.0-beta.87"
