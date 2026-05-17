@@ -16,7 +16,7 @@ A module written in TypeScript that uses the [osu!droid Public API](https://new.
 ## installation
 
 ```bash
-npm install @floemia/osu-droid-sdk # SOON
+npm install @floemia/osu-droid-tools
 ```
 
 ## example usages
@@ -24,7 +24,7 @@ npm install @floemia/osu-droid-sdk # SOON
 - **Request a user, calculate the performance values of their top play**
 
 ```ts
-import { DroidUser } from '@floemia/osu-droid-sdk';
+import { DroidUser } from '@floemia/osu-droid-tools';
 
 // get a user
 const user = await DroidUser.get({ id: 177955 });
@@ -78,15 +78,25 @@ const scores = await user.getScores({
 - **Create a score and calculate its performance values**
 
 ```ts
-const map = await MapInfo.getInformation('044004849f25542e49179611544e1e00');
 const score = DroidScore.create({
   n300: 1005,
   n100: 13,
   mods: 'EZHDNCPR',
-  beatmap: map,
+  beatmap: map || '044004849f25542e49179611544e1e00',
   max_combo: 1054,
 });
 const performance = await score.calculate();
+```
+
+- **Get the leaderboard of a beatmap**
+
+```ts
+import { DroidServer } from "@floemia/osu-droid-tools";
+
+const map_lb = DroidServer.getMapLeaderboard({
+  beatmapOrHash: map || '044004849f25542e49179611544e1e00'
+  order: "pp" // "score" | "pp" | "sid" | "date", defaults to "pp"
+});
 ```
 
 ## to do:

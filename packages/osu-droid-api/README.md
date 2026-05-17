@@ -8,7 +8,7 @@ This is a basic wrapper for the [osu!droid Public API](https://new.osudroid.moe/
 ## Installation
 
 ```bash
-npm install @floemia/osu-droid-api # SOON
+npm install @floemia/osu-droid-api
 ```
 
 ## Example usages
