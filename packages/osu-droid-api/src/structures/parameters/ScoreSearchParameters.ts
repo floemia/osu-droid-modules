@@ -24,7 +24,7 @@ export interface ScoreSearchParameters {
    * - `score`: Score (highest first)
    * - `pp`: Performance (highest first)
    *
-   * Defaults to `sid`.
+   * Defaults to `pp`.
    */
   order?: 'sid' | 'date' | 'score' | 'pp';
 
