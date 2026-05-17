@@ -101,4 +101,5 @@ const map_lb = DroidServer.getMapLeaderboard({
 
 ## to do:
 
-- - [ ] PP / Score leaderboard support
+- - [ ] global/regional user leaderboard support
+- - [ ] add other server related methods

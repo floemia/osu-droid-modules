@@ -1,20 +1,10 @@
 {
   "name": "root",
-  "version": "1.0.0",
-  "description": "A monorepo containing osu!droid related utilities.",
-  "repository": {
-    "url": "https://github.com/floemia/osu-droid-modules"
-  },
-  "main": "index.js",
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "format": "prettier --write \"packages/**/*.ts\"",
     "format:check": "prettier --check \"packages/**/*.ts\""
   },
-  "keywords": [],
-  "author": "floemia",
-  "license": "ISC",
-  "type": "module",
   "devDependencies": {
     "@types/node": "^25.6.2",
     "dotenv": "^17.4.2",
