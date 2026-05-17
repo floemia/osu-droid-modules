@@ -23,6 +23,6 @@
   },
   "workspaces": [
     "packages/osu-droid-api",
-    "packages/osudroid.js"
+    "packages/osu-droid-tools"
   ]
 }

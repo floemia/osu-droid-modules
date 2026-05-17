@@ -1,13 +1,20 @@
 {
-  "name": "@floemia/osudroid.js",
+  "name": "@floemia/osu-droid-tools",
   "version": "1.0.0",
-  "description": "An unofficial module that allows you to interact with the osu!droid API with ease, and more.",
+  "description": "A module that turns osu!droid Public API responses into functional TypeScript instances.",
+  "repository": {
+    "url": "https://github.com/floemia/osu-droid-modules/tree/master/packages/osu-droid-tools"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --clean"
   },
-  "keywords": [],
+  "keywords": [
+    "api",
+    "osu!droid",
+    "osu"
+  ],
   "author": "floemia",
   "license": "ISC",
   "type": "commonjs",

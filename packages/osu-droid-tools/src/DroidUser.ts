@@ -1,6 +1,6 @@
-import { DroidAPI, UserParameters, UserResponse } from '@floemia/osu-droid-api';
+import { DroidAPI, ScoreResponse, UserParameters, UserResponse } from '@floemia/osu-droid-api';
 import { MapInfo } from '@rian8337/osu-base';
-import { CompareParameters } from '@structures/parameters';
+import { UserScoreSearchParameters } from '@structures/parameters';
 import { DroidUserScores } from '@structures/score';
 import { DroidUserStats } from '@structures/user';
 import { DroidScore } from '~DroidScore';
@@ -99,11 +99,18 @@ export class DroidUser {
     this.developer = Boolean(response.Developer);
     this.contributor = Boolean(response.Contributor);
     this.scores = {
-      best: response.Top50Plays.map((s) => new DroidScore(s)),
-      recent: response.Last50Scores.map((s) => new DroidScore(s)),
+      best: this.map_scores(response.Top50Plays, this),
+      recent: this.map_scores(response.Last50Scores, this),
     };
   }
 
+  /**
+   * Converts an API score to a `DroidScore` instance.
+   * @param scores The raw API response of a score.
+   * @param user The user who submitted the score.
+   */
+  private map_scores = (scores: ScoreResponse[], user: DroidUser): DroidScore[] =>
+    scores.map((s) => DroidScore.fromAPIResponse(s, user));
   /**
    * Retrieves a user from the osu!droid API.
    * @param params A `UserParameters` object containing the user's ID or username.
@@ -133,14 +140,13 @@ export class DroidUser {
   }
 
   /**
-   * Retrieves scores of a user in a map (Alias of {@link DroidScore.search()}).
-   * @param params The {@link CompareParameters} containing the beatmap and score order.
-   * @returns A `DroidScore[]` containing the requested scores.
+   * Retrieves a list of scores of a user.
+   * @param params Configuration for the search request. See {@link UserScoreSearchParameters}.
    */
-  async getScoresInMap(params: CompareParameters): Promise<DroidScore[]> {
+  async getScores(params: UserScoreSearchParameters): Promise<DroidScore[]> {
     return await DroidScore.search({
       user: this,
-      hash: params.beatmapOrHash instanceof MapInfo ? params.beatmapOrHash.hash : params.beatmapOrHash,
+      beatmapOrHash: params.beatmapOrHash instanceof MapInfo ? params.beatmapOrHash : (params.beatmapOrHash ?? ''),
       order: params.order ?? 'pp',
     });
   }

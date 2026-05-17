@@ -148,7 +148,8 @@ export abstract class DroidAPI {
    * @param params Configuration for the search request. See {@link ScoreSearchParameters}.
    */
   static async scoreSearch(params: ScoreSearchParameters): Promise<ScoreSearchResponse[]> {
-    const { id, username, hash, order = 'sid', page = 0 } = params;
+    if (!params) throw new Error('No parameters provided.');
+    const { id, username, hash, order = 'pp', page = 0 } = params;
 
     if (page && page < 0) throw new Error('Page must be greater than or equal to 0.');
     let suffix = `/score-search?`;

@@ -67,7 +67,7 @@ export interface LeaderboardResponse<T extends PPLeaderboardUser | ScoreLeaderbo
   CurrentPage: number;
 
   /**
-   * The next page.
+   * The next page. `null` if `CurrentPage == TotalPages`.
    */
-  NextPage: number;
+  NextPage: number | null;
 }
