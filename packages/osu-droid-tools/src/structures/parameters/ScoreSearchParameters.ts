@@ -1,6 +1,9 @@
 import { MapInfo } from '@rian8337/osu-base';
 import { DroidUser } from '~DroidUser';
 
+/**
+ * Parameters for searching scores.
+ */
 export interface ScoreSearchParameters {
   /**
    * An instance of `DroidUser`, their `id` or `username`.
@@ -29,9 +32,17 @@ export interface ScoreSearchParameters {
   page?: number;
 }
 
-export interface UserScoreSearchParameters extends Omit<ScoreSearchParameters, 'user'> {
+/**
+ * Parameters for searching scores of a user.
+ */
+export interface UserScoreSearchParameters extends Omit<ScoreSearchParameters, 'user'> {}
+
+/**
+ * Parameters for comparing a score to another user's.
+ */
+export interface CompareParameters extends Omit<ScoreSearchParameters, 'user'> {
   /**
-   * An instance of `DroidUser`, their `id` or `username`.
+   * The user to compare scores with.
    */
   user: DroidUser | number | string;
 }

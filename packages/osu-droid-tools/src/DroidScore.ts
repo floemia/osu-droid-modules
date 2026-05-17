@@ -10,7 +10,7 @@ import {
   PerformanceCalculationOptions,
 } from '@rian8337/osu-difficulty-calculator';
 import { ReplayAnalyzer } from '@rian8337/osu-droid-replay-analyzer';
-import { ScoreCreationParameters, ScoreSearchParameters, UserScoreSearchParameters } from '@structures/parameters';
+import { CompareParameters, ScoreCreationParameters, ScoreSearchParameters } from '@structures/parameters';
 import { ScoreData } from '@structures/score';
 import { DroidUser } from '~DroidUser';
 
@@ -324,9 +324,9 @@ export class DroidScore {
 
   /**
    * Returns the score of another user in this score's map.
-   * @param params Configuration for the search request. See {@link UserScoreSearchParameters}.
+   * @param params Configuration for the search request. See {@link CompareParameters}.
    */
-  async compare(params: UserScoreSearchParameters): Promise<DroidScore | undefined> {
+  async compare(params: CompareParameters): Promise<DroidScore | undefined> {
     const map = await this.getBeatmap();
     if (!map) return undefined;
     const score = await DroidScore.search({

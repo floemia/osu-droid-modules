@@ -4,6 +4,7 @@
   "description": "A basic wrapper for the osu!droid Public API, written in TypeScript.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "homepage": "https://github.com/floemia/osu-droid-modules/tree/master/packages/osu-droid-api",
   "scripts": {
     "build": "tsup src/index.ts --clean"
   },
@@ -15,8 +16,14 @@
   ],
   "author": "floemia",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/floemia/osu-droid-modules/issues"
+  },
   "type": "commonjs",
   "files": [
     "dist"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

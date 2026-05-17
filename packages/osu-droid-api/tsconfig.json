@@ -1,12 +1,12 @@
 {
-    "extends": "../../tsconfig.json",
-    "compilerOptions": {
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "moduleResolution": "node16",
-        "paths": {
-            "@structures/*": ["./src/structures/*"]
-        }
-    },
-    "include": ["src/**/*"]
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "moduleResolution": "node16",
+    "paths": {
+      "@structures/*": ["./src/structures/*"]
+    }
+  },
+  "include": ["src/**/*"]
 }
