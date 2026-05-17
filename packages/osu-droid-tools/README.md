@@ -54,7 +54,7 @@ const user = 'someone';
 const their_scores = await DroidScore.search({
   user: user,
   beatmapOrHash: map || 'e9c0d351602d8b2d362ade920d8eb7a6',
-  order: 'pp',
+  order: 'pp', // "score" | "pp" | "sid" | "date", defaults to "pp"
 });
 
 const score = their_scores[0];
@@ -91,11 +91,11 @@ const performance = await score.calculate();
 - **Get the leaderboard of a beatmap**
 
 ```ts
-import { DroidServer } from "@floemia/osu-droid-tools";
+import { DroidServer } from '@floemia/osu-droid-tools';
 
 const map_lb = DroidServer.getMapLeaderboard({
-  beatmapOrHash: map || '044004849f25542e49179611544e1e00'
-  order: "pp" // "score" | "pp" | "sid" | "date", defaults to "pp"
+  beatmapOrHash: map || '044004849f25542e49179611544e1e00',
+  order: 'pp', // "score" | "pp" | "sid" | "date", defaults to "pp"
 });
 ```
 
