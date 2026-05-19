@@ -1,7 +1,7 @@
 # osu-droid-api
 
 > [!NOTE]
-> Consider using [@floemia/osu-droid-tools]() instead, a module that converts the data obtained from this wrapper into instances with useful methods.
+> Consider using [@floemia/osu-droid-tools](../osu-droid-tools/) instead, a module that converts the data obtained from this wrapper into instances with useful methods.
 
 This is a basic wrapper for the [osu!droid Public API](https://new.osudroid.moe/api2/frontend/docs/) written in TypeScript. All of the methods return the raw data given by the API. 100% coverage.
 
