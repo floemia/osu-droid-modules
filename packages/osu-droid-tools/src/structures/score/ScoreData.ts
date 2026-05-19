@@ -1,76 +1,44 @@
-import { Accuracy, MapInfo, ModMap, ScoreRank } from '@rian8337/osu-base';
+import { ScoreCreationParameters } from '@floemia/osu-droid-base';
 /**
  * Used as a parameter for the `DroidScore` constructor.
  */
-export interface ScoreData {
+export interface ScoreData extends ScoreCreationParameters {
   /**
-   * The user's ID.
-   */
-  uid?: number;
-  /**
-   * The user's username.
-   */
-  username?: string;
-  /**
-   * The score's ID.
+   * The ID of the score;
    */
   id: number;
+
   /**
-   * The filename of the beatmap.
+   * The user ID of the user who submitted the score.
    */
-  filename: string;
+  uid: number;
+
   /**
-   * The obtained amount of score.
+   * The username of the user who submitted the score.
    */
-  total_score: number;
-  /**
-   * The obtained performance points.
-   * Returns `null` if the beatmap is not ranked.
-   */
-  pp: number | null;
-  /**
-   * The achieved rank.
-   */
-  rank: ScoreRank;
-  /**
-   * The obtained accuracy.
-   */
-  accuracy: Accuracy;
-  /**
-   * The max combo achieved.
-   */
-  max_combo: number;
+  username: string;
+
   /**
    * The `Date` the score was set at.
    */
   played_at: Date;
+
   /**
-   * The beatmap's MD5 hash.
-   * Use it to obtain the beatmap.
-   */
-  hash: string;
-  /**
-   * The applied mods.
-   */
-  mods: ModMap;
-  /**
-   * The amount of slider end hits. Can be `null` if the replay is missing from the server.
+   * The amount of slider end hits.
    */
   slider_end_hits: number | null;
   /**
-   * The amount of slider head hits. Can be `null` if the replay is missing from the server.
+   * The amount of slider head hits.
    */
   slider_head_hits: number | null;
+
   /**
-   * The amount of slider repeat hits. Can be `null` if the replay is missing from the server.
+   * The amount of slider repeat hits.
    */
   slider_repeat_hits: number | null;
+
   /**
-   * The amount of slider tick hits. Can be `null` if the replay is missing from the server.
+   * The amount of slider tick hits.
    */
   slider_tick_hits: number | null;
-  /**
-   * The beatmap of the score.
-   */
-  beatmap?: MapInfo | undefined;
 }

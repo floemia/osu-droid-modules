@@ -38,11 +38,16 @@ export interface ScoreSearchParameters {
 export interface UserScoreSearchParameters extends Omit<ScoreSearchParameters, 'user'> {}
 
 /**
- * Parameters for comparing a score to another user's.
+ * Parameters for requesting a beatmap's leaderboard.
  */
-export interface CompareParameters extends Omit<ScoreSearchParameters, 'user'> {
+export interface MapLeaderboardParameters extends Omit<ScoreSearchParameters, 'beatmapOrHash' | 'order' | 'user'> {
   /**
-   * The user to compare scores with.
+   * The beatmap or its MD5 hash.
    */
-  user: DroidUser | number | string;
+  beatmapOrHash: MapInfo<true> | string;
+
+  /**
+   * Order scores by: `score`, `pp`. Defaults to `score`.
+   */
+  order?: 'score' | 'pp';
 }

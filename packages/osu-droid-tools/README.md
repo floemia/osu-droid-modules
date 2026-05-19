@@ -1,13 +1,16 @@
-# osu-droid-tools
+<div align="center" style='font-size :40px; font-weight: bold'>
+osu-droid-tools
+</div>
+
+---
 
 A module written in TypeScript that uses the [osu!droid Public API](https://new.osudroid.moe/api2/frontend/docs) with the help of [@floemia/osu-droid-api](../osu-droid-api), turning the raw responses into instances with useful methods.
 
-## dependencies
+## dependencies (thank you)
 
-- [@floemia/osu-droid-api](../osu-droid-api) - osu!droid Public API interaction
-- [@rian8337/osu-base](https://github.com/Rian8337/osu-droid-module/tree/master/packages/osu-base) - osu! API interaction
-- [@rian8337/osu-difficulty-calculator](https://github.com/Rian8337/osu-droid-module/tree/master/packages/osu-difficulty-calculator) - osu! / osu!droid difficulty and performance caclulation
-- [@rian8337/osu-replay-analyzer](https://github.com/Rian8337/osu-droid-module/tree/master/packages/osu-droid-replay-analyzer) - to gather replays and analyze them
+- [@rian8337/osu-base](https://github.com/Rian8337/osu-droid-module/tree/master/packages/osu-base) - osu! API interaction and other utilities
+- [@rian8337/osu-difficulty-calculator](https://github.com/Rian8337/osu-droid-module/tree/master/packages/osu-difficulty-calculator) - osu! / osu!droid difficulty and performance calculation
+- [@rian8337/osu-replay-analyzer](https://github.com/Rian8337/osu-droid-module/tree/master/packages/osu-droid-replay-analyzer) - osu!droid replay gathering and analysis
 
 ## requirements
 
@@ -19,87 +22,70 @@ A module written in TypeScript that uses the [osu!droid Public API](https://new.
 npm install @floemia/osu-droid-tools
 ```
 
+Then, import it in your code:
+
+```ts
+import { DroidUser, DroidScore, DroidServer } from '@floemia/osu-droid-tools';
+// or
+const { DroidUser, DroidScore, DroidServer } = require('@floemia/osu-droid-tools');
+```
+
 ## example usages
 
 - **Request a user, calculate the performance values of their top play**
 
 ```ts
-import { DroidUser } from '@floemia/osu-droid-tools';
-
 // get a user
-const user = await DroidUser.get({ id: 177955 });
-// or
-const user = await DroidUser.get({ username: 'MG_floemia' });
+const user = await DroidUser.get('MG_floemia' || 177955);
 
-// grab the user's top plays
 const top_plays = user.scores.best;
 const score = top_plays[0];
 
-// calculate difficulty and performance values for osu! and osu!droid
-const performance_droid = await score.calculate('droid');
-const performance_osu = await score.calculate('osu');
+const performance = await score.calculate('droid' || 'osu'); // defaults to 'droid'
 ```
 
-- **Having a beatmap, search the scores from another user, ordered by highest PP**
+- **Having a score, compare it to another user's score in the same beatmap**
 
 ```ts
-import { DroidScore, DroidUser } from '@floemia/osu-droid-tools';
-
-const user = await DroidUser.get({ id: 123456 });
-// alternatively, use their UID instead
-const user = 123456;
-// ... or username
-const user = 'someone';
-
-const their_scores = await DroidScore.search({
-  user: user,
-  beatmapOrHash: map || 'e9c0d351602d8b2d362ade920d8eb7a6',
-  order: 'pp', // "score" | "pp" | "sid" | "date", defaults to "pp"
-});
-
-const score = their_scores[0];
-console.log(score.isFC()); // true!!!!!!!!
-console.log(score.getFinalSpeed()); // uhh like DT (1.5x) on top of CS(1.3x) = 1.95 !!!
-
-// get the replay from this score
-const replay = await score.getReplay();
+const user = await DroidUser.get('MG_floemia' || 177955);
+const my_score = user.scores.best[0];
+const their_score = await score.compare('someone', 'pp' || 'score'); // defaults to highest 'pp' score
+console.log(score.pp > other_score.pp);
 ```
 
-- **Having a user, search their plays in a beatmap, ordered by highest score**
+- **Having a score, convert it to a full combo and compare the performance values**
 
 ```ts
-const user = await DroidUser.get({ username: 'MG_floemia' });
+const score = user.scores.recent[0];
+const performance = await score.calculate();
+
+if (!score.isFC()) {
+  const score_fc = score.toFC();
+  const performance_fc = await score_fc.calculate();
+  console.log(performance_fc.total - performance.total);
+}
+```
+
+- **Having a user, search their plays in a beatmap**
+
+```ts
+const user = await DroidUser.get('MG_floemia' || 177955);
 const scores = await user.getScores({
   beatmapOrHash: map || '652320f3590ebb8c66a19e2d7e37c153',
-  order: 'score', // "score" | "pp" | "sid" | "date", defaults to "pp"
+  order: 'score' || 'pp' || 'sid' || 'date', // defaults to highest 'pp' first
 });
-```
-
-- **Create a score and calculate its performance values**
-
-```ts
-const score = DroidScore.create({
-  n300: 1005,
-  n100: 13,
-  mods: 'EZHDNCPR',
-  beatmap: map || '044004849f25542e49179611544e1e00',
-  max_combo: 1054,
-});
-const performance = await score.calculate();
 ```
 
 - **Get the leaderboard of a beatmap**
 
 ```ts
-import { DroidServer } from '@floemia/osu-droid-tools';
-
 const map_lb = DroidServer.getMapLeaderboard({
   beatmapOrHash: map || '044004849f25542e49179611544e1e00',
-  order: 'pp', // "score" | "pp" | "sid" | "date", defaults to "pp"
+  order: 'pp' || 'score' || 'sid' || 'date', // defaults to highest 'pp' first
 });
 ```
 
 ## to do:
 
-- - [ ] global/regional user leaderboard support
-- - [ ] add other server related methods
+- [ ] global/regional user leaderboard support
+- [ ] add other server related methods

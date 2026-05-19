@@ -3,11 +3,6 @@
  */
 export interface LeaderboardParameters {
   /**
-   * The type of leaderboard to fetch. Defaults to `pp`.
-   */
-  type?: 'pp' | 'score';
-
-  /**
    * Filter the leaderboard by country. Defaults to `all`.
    *
    * Must be [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements) compliant.

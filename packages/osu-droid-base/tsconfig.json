@@ -5,8 +5,9 @@
     "rootDir": "./src",
     "moduleResolution": "node16",
     "paths": {
-      "@structures/*": ["./src/structures/*"]
+      "@structures/*": ["./src/structures/*"],
+      "~*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "../osu-droid-base/src/structures/osu"]
+  "include": ["src/**/*", "../osu-droid-base/src/osu"]
 }

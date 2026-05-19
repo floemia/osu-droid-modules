@@ -1,12 +1,16 @@
 import { MapLeaderboardParameters } from '@structures/parameters';
 import { DroidScore } from '~DroidScore';
 
+/**
+ * A class with some methods that interact with the main osu!droid server.
+ */
 export abstract class DroidServer {
   /**
-   * Request a beatmap leaderboard from the server.
+   * Get a beatmap's leaderboard from the server.
    * @param params Configuration for the request. See {@link MapLeaderboardParameters}.
    */
   static async getMapLeaderboard(params: MapLeaderboardParameters): Promise<DroidScore[]> {
-    return await DroidScore.search(params);
+    if (!params.order) params.order = 'score';
+    return DroidScore.search(params);
   }
 }

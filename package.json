@@ -17,6 +17,7 @@
   },
   "workspaces": [
     "packages/osu-droid-api",
-    "packages/osu-droid-tools"
+    "packages/osu-droid-tools",
+    "packages/osu-droid-base"
   ]
 }

@@ -9,5 +9,5 @@
       "~*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "../osu-droid-base/src/structures/user"]
 }

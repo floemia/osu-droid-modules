@@ -1,16 +1,11 @@
 /**
  * Parameters for the `/score-search/` endpoint.
  */
-export interface ScoreSearchParameters {
+export interface SearchRequestParameters {
   /**
-   * The user's id.
+   * The user's id or username, if searching by user.
    */
-  id?: number;
-
-  /**
-   * The user's username.
-   */
-  username?: string;
+  user?: number | string;
 
   /**
    * The beatmap's MD5 hash, if searching by beatmap.
@@ -24,7 +19,7 @@ export interface ScoreSearchParameters {
    * - `score`: Score (highest first)
    * - `pp`: Performance (highest first)
    *
-   * Defaults to `pp`.
+   * Defaults to `score`.
    */
   order?: 'sid' | 'date' | 'score' | 'pp';
 

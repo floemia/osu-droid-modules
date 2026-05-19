@@ -1,46 +1,13 @@
-import { DroidAPI, ScoreResponse, UserParameters, UserResponse } from '@floemia/osu-droid-api';
-import { MapInfo } from '@rian8337/osu-base';
+import { DroidAPI, ScoreResponse, UserResponse } from '@floemia/osu-droid-api';
+import { User } from '@floemia/osu-droid-base';
 import { UserScoreSearchParameters } from '@structures/parameters';
 import { DroidUserScores } from '@structures/score';
-import { DroidUserStats } from '@structures/user';
 import { DroidScore } from '~DroidScore';
 
 /**
- * A class representing an osu!droid user.
+ * A class representing an osu!droid user from the main server.
  */
-export class DroidUser {
-  /**
-   * The user's ID.
-   */
-  id: number;
-
-  /**
-   * The user's username.
-   */
-  username: string;
-
-  /**
-   * The user's avatar URL.
-   *
-   * If `DroidUser.get()` is called with `check_avatar_url` set to `false`, the URL may return 404.
-   */
-  avatar_url: string;
-
-  /**
-   * The user's country.
-   */
-  country: string | null;
-
-  /**
-   * The user's page URL.
-   */
-  url: string;
-
-  /**
-   * The user's statistics.
-   */
-  statistics: DroidUserStats;
-
+export class DroidUser extends User {
   /**
    * The `Date` the user was registered.
    */
@@ -77,77 +44,90 @@ export class DroidUser {
   scores: DroidUserScores;
 
   constructor(response: UserResponse) {
-    this.id = response.UserId;
-    this.username = response.Username;
-    this.avatar_url = `https://osudroid.moe/user/avatar/${this.id}.png`;
-    this.country = response.Region;
-    this.url = 'https://osudroid.moe/profile.php?uid=' + this.id;
-    this.statistics = {
-      rank: {
-        global: response.GlobalRank,
-        country: response.CountryRank,
+    const {
+      UserId,
+      Username,
+      Region,
+      GlobalRank,
+      CountryRank,
+      OverallScore,
+      OverallPP,
+      OverallPlaycount,
+      OverallAccuracy,
+      Registered,
+      LastLogin,
+      Supporter,
+      CoreDeveloper,
+      Developer,
+      Contributor,
+      Top50Plays,
+      Last50Scores,
+    } = response;
+
+    super({
+      id: UserId,
+      username: Username,
+      avatar_url: `https://osudroid.moe/user/avatar/${UserId}.png`,
+      country: Region,
+      url: `https://osudroid.moe/profile.php?uid=${UserId}`,
+      statistics: {
+        rank: { global: GlobalRank, country: CountryRank },
+        total_score: OverallScore,
+        pp: OverallPP,
+        playcount: OverallPlaycount,
+        accuracy: OverallAccuracy,
       },
-      total_score: response.OverallScore,
-      pp: response.OverallPP,
-      playcount: response.OverallPlaycount,
-      accuracy: response.OverallAccuracy,
-    };
-    this.registered_at = new Date(response.Registered);
-    this.last_login = new Date(response.LastLogin);
-    this.supporter = Boolean(response.Supporter);
-    this.core_developer = Boolean(response.CoreDeveloper);
-    this.developer = Boolean(response.Developer);
-    this.contributor = Boolean(response.Contributor);
+    });
+    this.registered_at = new Date(Registered);
+    this.last_login = new Date(LastLogin);
+    this.supporter = Boolean(Supporter);
+    this.core_developer = Boolean(CoreDeveloper);
+    this.developer = Boolean(Developer);
+    this.contributor = Boolean(Contributor);
     this.scores = {
-      best: this.map_scores(response.Top50Plays, this),
-      recent: this.map_scores(response.Last50Scores, this),
+      best: this.mapScores(Top50Plays),
+      recent: this.mapScores(Last50Scores),
     };
   }
 
   /**
    * Converts an API score to a `DroidScore` instance.
    * @param scores The raw API response of a score.
-   * @param user The user who submitted the score.
    */
-  private map_scores = (scores: ScoreResponse[], user: DroidUser): DroidScore[] =>
-    scores.map((s) => DroidScore.fromAPIResponse(s, user));
+  private mapScores(scores: ScoreResponse[]): DroidScore[] {
+    return scores.map((score) => DroidScore.fromAPIResponse(score, this));
+  }
+
   /**
-   * Retrieves a user from the osu!droid API.
-   * @param params A `UserParameters` object containing the user's ID or username.
+   * Get a `DroidUser` instance, containing their information and scores.
+   * @param user The user's ID or username.
    * @param check_avatar_url Whether to validate the user's avatar URL or not. Defaults to `true`.
-   * @returns A `DroidUser` object containing the requested user's profile and scores.
    */
-  static async get(params: UserParameters, check_avatar_url: boolean = true): Promise<DroidUser | undefined> {
-    const response = await DroidAPI.getUser(params);
+  static async get(user: number | string, check_avatar_url: boolean = true): Promise<DroidUser | undefined> {
+    const response = await DroidAPI.getUser(user);
     if (!response) return undefined;
-    const user = new DroidUser(response);
-    if (check_avatar_url) await user.getAvatarURL();
-    return user;
+
+    const u = new DroidUser(response);
+    if (check_avatar_url) await u.validateAvatarURL();
+    return u;
   }
 
   /**
-   * Validates and returns the user's avatar URL.
-   * If the avatar is not found, it will return the default avatar.
-   * @returns A `string` containing the user's avatar URL.
+   * Validates the user's avatar URL. Falls back to the default avatar if 404 or unreachable.
    */
-  async getAvatarURL(): Promise<string> {
-    const response = await fetch(this.avatar_url, { method: 'HEAD' });
-    if (response.status == 200) return this.avatar_url;
-    else {
-      this.avatar_url = 'https://osu.ppy.sh/images/layout/avatar-guest@2x.png';
-      return this.avatar_url;
-    }
+  private async validateAvatarURL(): Promise<void> {
+    try {
+      const response = await fetch(this.avatar_url, { method: 'HEAD' });
+      if (response.status == 200) return;
+    } catch {}
+    this.avatar_url = 'https://osu.ppy.sh/images/layout/avatar-guest@2x.png';
   }
 
   /**
-   * Retrieves a list of scores of a user.
+   * Get a list of scores of this user that match the search criteria.
    * @param params Configuration for the search request. See {@link UserScoreSearchParameters}.
    */
   async getScores(params: UserScoreSearchParameters): Promise<DroidScore[]> {
-    return await DroidScore.search({
-      user: this,
-      beatmapOrHash: params.beatmapOrHash instanceof MapInfo ? params.beatmapOrHash : (params.beatmapOrHash ?? ''),
-      order: params.order ?? 'pp',
-    });
+    return DroidScore.search({ ...params, user: this });
   }
 }
