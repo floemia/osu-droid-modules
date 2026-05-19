@@ -64,7 +64,7 @@ if (!score.isFC()) {
 }
 ```
 
-- #### Having a user, search their plays in a beatmap\*\*
+- #### Having a user, search their plays in a beatmap
 
 ```ts
 const user = await DroidUser.get('MG_floemia' || 177955);
@@ -74,7 +74,7 @@ const scores = await user.getScores({
 });
 ```
 
-- #### Get the leaderboard of a beatmap\*\*
+- #### Get the leaderboard of a beatmap
 
 ```ts
 const map_lb = DroidServer.getMapLeaderboard({
