@@ -20,13 +20,13 @@ const { DroidAPI } = require('@floemia/osu-droid-api');
 
 ## example usages
 
-- **Request a user**
+- #### Request a user
 
 ```ts
 const user = await DroidAPI.getUser('MG_floemia' || 177955);
 ```
 
-- **Get a pp/score global or regional leaderboard**
+- #### Get a pp/score global or regional leaderboard
 
 ```ts
 // defaults to global pp leaderboard if no params are provided
@@ -37,7 +37,7 @@ const py_lb_scoreOrPP = await DroidAPI.getLeaderboard({
 });
 ```
 
-- **Get a list of scores of a user in a map, ordered by PP**
+- #### Get a list of scores of a user in a map, ordered by PP
 
 ```ts
 const scores = await DroidAPI.scoreSearch({

@@ -1,8 +1,6 @@
-<div align="center" style='font-size :40px; font-weight: bold'>
-osu-droid-tools
+<div align="center">
+  <h1>osu-droid-tools</h1>
 </div>
-
----
 
 A module written in TypeScript that uses the [osu!droid Public API](https://new.osudroid.moe/api2/frontend/docs) with the help of [@floemia/osu-droid-api](../osu-droid-api), turning the raw responses into instances with useful methods.
 
@@ -32,7 +30,7 @@ const { DroidUser, DroidScore, DroidServer } = require('@floemia/osu-droid-tools
 
 ## example usages
 
-- **Request a user, calculate the performance values of their top play**
+- #### Request a user, calculate the performance values of their top play
 
 ```ts
 // get a user
@@ -44,7 +42,7 @@ const score = top_plays[0];
 const performance = await score.calculate('droid' || 'osu'); // defaults to 'droid'
 ```
 
-- **Having a score, compare it to another user's score in the same beatmap**
+- #### Having a score, compare it to another user's score in the same beatmap
 
 ```ts
 const user = await DroidUser.get('MG_floemia' || 177955);
@@ -53,7 +51,7 @@ const their_score = await score.compare('someone', 'pp' || 'score'); // defaults
 console.log(score.pp > other_score.pp);
 ```
 
-- **Having a score, convert it to a full combo and compare the performance values**
+- #### Having a score, convert it to a full combo and compare the performance values
 
 ```ts
 const score = user.scores.recent[0];
@@ -66,7 +64,7 @@ if (!score.isFC()) {
 }
 ```
 
-- **Having a user, search their plays in a beatmap**
+- #### Having a user, search their plays in a beatmap\*\*
 
 ```ts
 const user = await DroidUser.get('MG_floemia' || 177955);
@@ -76,7 +74,7 @@ const scores = await user.getScores({
 });
 ```
 
-- **Get the leaderboard of a beatmap**
+- #### Get the leaderboard of a beatmap\*\*
 
 ```ts
 const map_lb = DroidServer.getMapLeaderboard({

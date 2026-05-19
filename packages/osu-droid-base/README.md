@@ -17,7 +17,7 @@ const { Score, User } = require('@floemia/osu-droid-base');
 
 ## example usages
 
-- **Create a score and calculate its performance values**
+- #### Create a score and calculate its performance values
 
 ```ts
 const score = new Score({
@@ -32,7 +32,7 @@ const score = new Score({
 const performance = await score.calculate('osu' || 'droid');
 ```
 
-- **Convert a score to a full combo score**
+- #### Convert a score to a full combo score
 
 ```ts
 const score = new Score({
