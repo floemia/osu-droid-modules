@@ -1,6 +1,6 @@
 {
   "name": "@floemia/osu-droid-rx-api",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A basic wrapper for the osudroid!rx API, written in TypeScript.",
   "homepage": "https://github.com/floemia/osu-droid-modules/tree/master/packages/osu-droid-rx-api",
   "main": "dist/index.js",

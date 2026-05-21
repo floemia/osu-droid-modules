@@ -1,6 +1,6 @@
 {
   "name": "@floemia/osu-droid-api",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A basic wrapper for the osu!droid Public API, written in TypeScript.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
