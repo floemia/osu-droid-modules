@@ -1,6 +1,6 @@
 {
   "name": "@floemia/osu-droid-base",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Base classes and methods for my osu!droid modules.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
