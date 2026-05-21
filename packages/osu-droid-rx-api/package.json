@@ -1,0 +1,33 @@
+{
+  "name": "@floemia/osu-droid-rx-api",
+  "version": "0.2.2",
+  "description": "A basic wrapper for the osudroid!rx API, written in TypeScript.",
+  "homepage": "https://github.com/floemia/osu-droid-modules/tree/master/packages/osu-droid-rx-api",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --clean"
+  },
+  "keywords": [
+    "api",
+    "osu-droid",
+    "relax"
+  ],
+  "author": "floemia",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/floemia/osu-droid-modules.git"
+  },
+  "bugs": {
+    "url": "https://github.com/floemia/osu-droid-modules/issues"
+  },
+  "type": "commonjs",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "1dd5a3734d07a106e9db60703817d110328bc0a7"
+}

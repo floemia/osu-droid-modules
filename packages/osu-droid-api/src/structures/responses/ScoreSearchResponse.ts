@@ -1,4 +1,4 @@
-import { Mod, ScoreRank } from '@structures/osu';
+import { Mod, ScoreRank } from '@structures/responses';
 
 /**
  * The raw score response from the `/score-search` endpoint.

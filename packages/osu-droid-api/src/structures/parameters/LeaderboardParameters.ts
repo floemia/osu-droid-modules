@@ -1,3 +1,15 @@
+import { PPLeaderboardUser, ScoreLeaderboardUser } from '@structures/responses';
+
+/**
+ * The type of leaderboard.
+ */
+export type LeaderboardType = 'pp' | 'score';
+
+/**
+ * The type of leaderboard user.
+ */
+export type LeaderboardUserType<T extends LeaderboardType> = T extends 'pp' ? PPLeaderboardUser : ScoreLeaderboardUser;
+
 /**
  * Parameters for the `/leaderboard/` endpoint.
  */
@@ -18,4 +30,9 @@ export interface LeaderboardParameters {
    * The page to fetch. Defaults to 1.
    */
   page?: number;
+
+  /**
+   * The type of leaderboard to fetch. Defaults to `pp`.
+   */
+  type?: LeaderboardType;
 }

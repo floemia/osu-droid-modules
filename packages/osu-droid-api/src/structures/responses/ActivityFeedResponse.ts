@@ -1,4 +1,4 @@
-import { ScoreRank } from '@structures/osu';
+import { ScoreRank } from '@structures/responses';
 
 /**
  * The raw response from the `/activity-feed` endpoint.

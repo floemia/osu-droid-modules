@@ -1,4 +1,22 @@
-import { Mod, ScoreRank } from '@structures/osu';
+/**
+ * Represents an osu!droid mod.
+ */
+export interface Mod {
+  /**
+   * The acronym of the mod.
+   */
+  readonly acronym: string;
+
+  /**
+   * The mod's settings, if applicable.
+   */
+  readonly settings?: Record<string, unknown>;
+}
+
+/**
+ * Achievable ranks in a score.
+ */
+export type ScoreRank = 'XH' | 'SH' | 'X' | 'S' | 'A' | 'B' | 'C' | 'D';
 
 /**
  * The raw score response from the `/profile-uid` and `/profile-username` endpoints.

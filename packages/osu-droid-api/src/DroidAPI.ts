@@ -1,4 +1,9 @@
-import { LeaderboardParameters, SearchRequestParameters } from '@structures/parameters';
+import {
+  LeaderboardParameters,
+  LeaderboardType,
+  LeaderboardUserType,
+  SearchRequestParameters,
+} from '@structures/parameters';
 import {
   ActivityFeedResponse,
   AvatarHashesResponse,
@@ -22,15 +27,36 @@ export abstract class DroidAPI {
 
   /**
    * Basic fetch method with `BASE_URL` as prefix. Returns `undefined` if 404.
-   * @param url The url to call.
+   * @param suffix The suffix of the URL.
    */
   private static async call(suffix: string): Promise<Response | undefined> {
     const response = await fetch(this.BASE_URL + suffix);
     if (!response.ok) {
       if (response.status == 404) return undefined;
-      else throw new Error(`${response.status} ${response.statusText}`);
+      const json = await response.json();
+      throw new Error(`${response.status} ${response.statusText} - ${json.error}`);
     }
     return response;
+  }
+
+  /**
+   * Returns the response of an API call as JSON.
+   * @param suffix The suffix of the URL.
+   */
+  private static async getJSON(suffix: string): Promise<any | undefined> {
+    const response = await this.call(suffix);
+    if (!response) return undefined;
+    return response.json();
+  }
+
+  /**
+   * Returns the response of an API call as an `ArrayBuffer`.
+   * @param suffix The suffix of the URL.
+   */
+  private static async getArrayBuffer(suffix: string): Promise<ArrayBuffer | undefined> {
+    const response = await this.call(suffix);
+    if (!response) return undefined;
+    return response.arrayBuffer();
   }
 
   /**
@@ -39,31 +65,36 @@ export abstract class DroidAPI {
    * @param user The user's ID or username.
    */
   static async getUser(user: number | string): Promise<UserResponse | undefined> {
-    const suffix = typeof user == 'string' ? `/profile-username/${user}` : `/profile-uid/${user}`;
-    const response = await this.call(suffix);
-    if (!response) return undefined;
-    return response.json();
+    return this.getJSON(typeof user == 'string' ? `/profile-username/${user}` : `/profile-uid/${user}`);
   }
 
   /**
-   * Requests a PP leaderboard (`/leaderboard`).
-   * @param params Configuration for the leaderboard request. See {@link LeaderboardParameters}.
+   * Requests a performance points leaderboard (`/leaderboard`).
+   * @param params Configuration for the leaderboard request. See {@link LeaderboardParameters}
    */
-  static async getLeaderboard(
-    params: LeaderboardParameters & { type: 'pp' },
+  static async getLeaderboard<T extends LeaderboardType>(
+    params: Omit<LeaderboardParameters, 'type'> & { type?: 'pp' },
   ): Promise<LeaderboardResponse<PPLeaderboardUser>>;
 
   /**
    * Requests a score leaderboard (`/leaderboard`).
-   * @param params Configuration for the leaderboard request. See {@link LeaderboardParameters}.
+   * @param params Configuration for the leaderboard request. See {@link LeaderboardParameters}
    */
-  static async getLeaderboard(
-    params: LeaderboardParameters & { type: 'score' },
+  static async getLeaderboard<T extends LeaderboardType>(
+    params: Omit<LeaderboardParameters, 'type'> & { type: 'score' },
   ): Promise<LeaderboardResponse<ScoreLeaderboardUser>>;
 
-  static async getLeaderboard(
-    params: LeaderboardParameters & { type: 'pp' | 'score' },
-  ): Promise<LeaderboardResponse<any>> {
+  /**
+   * Requests a score or performance points leaderboard (`/leaderboard`).
+   * @param params Configuration for the leaderboard request. See {@link LeaderboardParameters}
+   */
+  static async getLeaderboard<T extends LeaderboardType>(
+    params: Omit<LeaderboardParameters, 'type'> & { type: T },
+  ): Promise<LeaderboardResponse<LeaderboardUserType<T>>>;
+
+  static async getLeaderboard<T extends LeaderboardType>(
+    params: LeaderboardParameters,
+  ): Promise<LeaderboardResponse<LeaderboardUserType<T>>> {
     const { limit = 50, page = 1, type = 'pp', region = 'all' } = params;
 
     if (limit > 50 || limit < 1) throw new Error('Limit must be between 1 and 50.');
@@ -71,11 +102,7 @@ export abstract class DroidAPI {
     if (region != 'all' && region.length != 2)
       throw new Error('Invalid country code provided. Must be ISO 3166-1 alpha-2 compliant.');
 
-    const suffix = `/leaderboard/type=${type}/region=${region}/page=${page}/limit=${limit}`;
-
-    const response = await this.call(suffix);
-    // returns "Results" = [] even if 404
-    return response!.json();
+    return this.getJSON(`/leaderboard/type=${type}/region=${region}/page=${page}/limit=${limit}`);
   }
 
   /**
@@ -84,11 +111,7 @@ export abstract class DroidAPI {
    */
   static async getDefaultAvatar(size: number = 128): Promise<ArrayBuffer> {
     if (size < 64 || size > 256) throw new Error('Size must be between 64 and 256.');
-    const suffix = `/avatar/default?size=${size}`;
-
-    // it's always there i mean it's the default avatar endpoint
-    const response = (await this.call(suffix))!;
-    return response.arrayBuffer();
+    return this.getArrayBuffer(`/avatar/default?size=${size}`) as Promise<ArrayBuffer>;
   }
 
   /**
@@ -98,11 +121,7 @@ export abstract class DroidAPI {
    */
   static async getAvatar(id: number, size: number = 128): Promise<ArrayBuffer | undefined> {
     if (size < 64 || size > 256) throw new Error('Size must be between 64 and 256.');
-
-    const suffix = `/avatar/userid/${id}?size=${size}`;
-    const response = await this.call(suffix);
-    if (!response) return undefined;
-    return response.arrayBuffer();
+    return this.getArrayBuffer(`/avatar/userid/${id}?size=${size}`);
   }
 
   /**
@@ -111,11 +130,7 @@ export abstract class DroidAPI {
    */
   static async getAvatarByHash(hash: string, size: number = 128): Promise<ArrayBuffer | undefined> {
     if (size < 64 || size > 256) throw new Error('Size must be between 64 and 256.');
-
-    const suffix = `/avatar/hash/${hash}?size=${size}`;
-    const response = await this.call(suffix);
-    if (!response) return undefined;
-    return response.arrayBuffer();
+    return this.getArrayBuffer(`/avatar/hash/${hash}?size=${size}`);
   }
 
   /**
@@ -127,11 +142,8 @@ export abstract class DroidAPI {
     if (typeof ids == 'number') ids = [ids];
     if (size < 64 || size > 256) throw new Error('Size must be between 64 and 256.');
     if (ids.length < 1 || ids.length > 100) throw new Error('IDs must be between 1 and 100.');
-    const suffix = `/avatar/hashes/${ids.join(',')}?size=${size}`;
 
-    const response = await this.call(suffix);
-    // returns "list" = [] even if 404
-    return response!.json();
+    return this.getJSON(`/avatar/hashes/${ids.join(',')}?size=${size}`);
   }
 
   /**
@@ -151,9 +163,7 @@ export abstract class DroidAPI {
     suffix += `&order=${order}`;
     if (page) suffix += `&page=${page}`;
 
-    // returns [] even if user is 404
-    const response = await this.call(suffix);
-    return response!.json();
+    return this.getJSON(suffix);
   }
 
   /**
@@ -162,23 +172,20 @@ export abstract class DroidAPI {
    * **Limited to 20 requests per minute. Excludes restricted, archived and banned users.**
    */
   static async getActivityFeed(): Promise<ActivityFeedResponse> {
-    const response = await this.call('/activity-feed');
-    return response!.json();
+    return this.getJSON('/activity-feed');
   }
 
   /**
    * Requests the current server's online statistics (`/online-stats`).
    */
   static async getOnlineStats(): Promise<OnlineStatsResponse> {
-    const response = await this.call('/online-stats');
-    return response!.json();
+    return this.getJSON('/online-stats');
   }
 
   /**
    * Requests the list of developers, contributors and supporters (`/special-users`).
    */
   static async getSpecialUsers(): Promise<SpecialUsersResponse[]> {
-    const response = await this.call('/special-users');
-    return response!.json();
+    return this.getJSON('/special-users');
   }
 }

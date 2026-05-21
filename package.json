@@ -16,6 +16,7 @@
     "typescript": "^6.0.3"
   },
   "workspaces": [
+    "packages/osu-droid-rx-api",
     "packages/osu-droid-api",
     "packages/osu-droid-tools",
     "packages/osu-droid-base"

@@ -12,6 +12,15 @@ import { ReplayAnalyzer } from '@rian8337/osu-droid-replay-analyzer';
 import { ScoreCreationParameters } from '@structures/parameters';
 
 /**
+ * Available gamemodes.
+ */
+type Mode = 'osu' | 'droid';
+
+/**
+ * The type of calculator.
+ */
+type Calculator<T extends Mode> = T extends 'osu' ? OsuPerformanceCalculator : DroidPerformanceCalculator;
+/**
  * A class representing a generic osu!droid score.
  */
 export class Score {
@@ -174,21 +183,24 @@ export class Score {
     this.beatmap = map;
     return map;
   }
+  /**
+   * Calculates the performance values of this score, using the osu!droid PP system.
+   **/
+  async calculate(mode?: 'droid'): Promise<DroidPerformanceCalculator | undefined>;
 
   /**
-   * Calculates the performance of this score, using the osu!droid PP system.
-   */
-  async calculate(mode: 'droid', replay?: ReplayAnalyzer): Promise<DroidPerformanceCalculator | undefined>;
+   * Calculates the performance values of this score, using the osu! PP system.
+   **/
+  async calculate(mode: 'osu'): Promise<OsuPerformanceCalculator | undefined>;
 
   /**
-   * Calculates the performance of this score, using the osu! PP system.
+   * Calculates the performance values of this score, using the osu!droid or osu! PP system.
+   * @param mode The system to use. Defaults to `droid`.
    */
-  async calculate(mode: 'osu', replay?: ReplayAnalyzer): Promise<OsuPerformanceCalculator | undefined>;
+  async calculate(mode: Mode): Promise<Calculator<Mode> | undefined>;
 
-  async calculate(
-    mode: 'osu' | 'droid' = 'droid',
-    replay?: ReplayAnalyzer,
-  ): Promise<OsuPerformanceCalculator | DroidPerformanceCalculator | undefined> {
+  async calculate<T extends Mode = 'droid'>(mode: T = 'droid' as T): Promise<Calculator<T> | undefined> {
+    let replay;
     if ((this as any).replay && (this as any).replay instanceof ReplayAnalyzer) replay = (this as any).replay;
     const isDroid = mode == 'droid';
     const map = await this.getBeatmap();
@@ -214,7 +226,7 @@ export class Score {
       ? new DroidPerformanceCalculator(rating as ExtendedDroidDifficultyAttributes)
       : new OsuPerformanceCalculator(rating as OsuDifficultyAttributes);
     const performance = perf_calculator.calculate(calc_options);
-    return performance;
+    return performance as Calculator<T>;
   }
 
   /**

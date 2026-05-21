@@ -74,6 +74,24 @@ const scores = await user.getScores({
 });
 ```
 
+- #### Get the current PP leaderboard
+
+````ts
+const leaderboard = await DroidServer.getUserLeaderboard({
+  type: 'pp' || 'score', // defaults to 'pp'
+  region: "all" || "AU" || "PY", // defaults to 'all'
+});
+for (const user of leaderboard) {
+  console.log(`${user.username}: ${user.pp}pp`);
+}
+
+```ts
+const map_lb = DroidServer.getMapLeaderboard({
+  beatmapOrHash: map || '044004849f25542e49179611544e1e00',
+  order: 'pp' || 'score' || 'sid' || 'date', // defaults to highest 'pp' first
+});
+````
+
 - #### Get the leaderboard of a beatmap
 
 ```ts
@@ -85,5 +103,5 @@ const map_lb = DroidServer.getMapLeaderboard({
 
 ## to do:
 
-- [ ] global/regional user leaderboard support
+- [x] global/regional user leaderboard support
 - [ ] add other server related methods

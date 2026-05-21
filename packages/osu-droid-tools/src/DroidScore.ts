@@ -1,9 +1,8 @@
 import { DroidAPI, ScoreResponse, ScoreSearchResponse } from '@floemia/osu-droid-api';
-import { Score } from '@floemia/osu-droid-base';
+import { Score, ScoreCreationParameters } from '@floemia/osu-droid-base';
 import { Accuracy, MapInfo } from '@rian8337/osu-base';
 import { ReplayAnalyzer } from '@rian8337/osu-droid-replay-analyzer';
 import { ScoreSearchParameters } from '@structures/parameters';
-import { ScoreData } from '@structures/score';
 import { DroidUser } from '~DroidUser';
 
 /**
@@ -37,12 +36,12 @@ export class DroidScore extends Score {
    */
   replay: ReplayAnalyzer | undefined;
 
-  private constructor(input: ScoreData) {
+  private constructor(input: ScoreCreationParameters) {
     super(input);
-    this.id = input.id;
-    this.uid = input.uid;
-    this.username = input.username;
-    this.played_at = input.played_at;
+    this.id = input.id!;
+    this.uid = input.uid!;
+    this.username = input.username!;
+    this.played_at = input.played_at!;
   }
 
   /**
@@ -113,7 +112,6 @@ export class DroidScore extends Score {
     if (this.replay) return this.replay;
     const map = await this.getBeatmap();
     if (!map) return undefined;
-
     this.replay = new ReplayAnalyzer({ scoreID: this.id, map: map.beatmap });
     return this.replay.analyze();
   }
@@ -138,6 +136,7 @@ export class DroidScore extends Score {
     const hash = hasBeatmap ? beatmapOrHash.hash : (beatmapOrHash ?? '');
     const u = (user instanceof DroidUser ? user.id : user) ?? '';
     const scores = await DroidAPI.scoreSearch({ user: u, hash, order, page });
+
     return scores.map((score) => DroidScore.fromAPISearchResponse(score, hasBeatmap ? beatmapOrHash : undefined));
   }
 }

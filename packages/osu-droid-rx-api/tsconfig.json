@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "moduleResolution": "node16",
+    "paths": {
+      "@structures/*": ["./src/structures/*"]
+    }
+  },
+  "include": ["src/**/*", "../osu-droid-base/src/structures/osu"]
+}

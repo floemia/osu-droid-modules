@@ -1,8 +1,21 @@
-import { DroidAPI, ScoreResponse, UserResponse } from '@floemia/osu-droid-api';
+import { DroidAPI, PPLeaderboardUser, ScoreLeaderboardUser, ScoreResponse, UserResponse } from '@floemia/osu-droid-api';
 import { User } from '@floemia/osu-droid-base';
 import { UserScoreSearchParameters } from '@structures/parameters';
-import { DroidUserScores } from '@structures/score';
 import { DroidScore } from '~DroidScore';
+
+/**
+ * The scores of a user.
+ */
+export interface DroidUserScores {
+  /**
+   * The recent scores of the user.
+   */
+  recent: DroidScore[];
+  /**
+   * The best scores of the user.
+   */
+  best: DroidScore[];
+}
 
 /**
  * A class representing an osu!droid user from the main server.
@@ -43,7 +56,7 @@ export class DroidUser extends User {
    */
   scores: DroidUserScores;
 
-  constructor(response: UserResponse) {
+  private constructor(response: UserResponse) {
     const {
       UserId,
       Username,
@@ -90,6 +103,9 @@ export class DroidUser extends User {
     };
   }
 
+  static async fromLeaderboardUser(user: LBDroidUser): Promise<DroidUser> {
+    return (await DroidUser.get(user.id)) as DroidUser;
+  }
   /**
    * Converts an API score to a `DroidScore` instance.
    * @param scores The raw API response of a score.
@@ -129,5 +145,70 @@ export class DroidUser extends User {
    */
   async getScores(params: UserScoreSearchParameters): Promise<DroidScore[]> {
     return DroidScore.search({ ...params, user: this });
+  }
+}
+
+/**
+ * A class representing a user in the main server's leaderboard.
+ *
+ * Contains partial information.
+ */
+export class LBDroidUser {
+  /**
+   * The user's ID.
+   */
+  id: number;
+
+  /**
+   * The user's username.
+   */
+  username: string;
+
+  /**
+   * The user's total playcount.
+   */
+  playcount: number;
+
+  constructor(user: ScoreLeaderboardUser | PPLeaderboardUser) {
+    this.id = user.UserId;
+    this.username = user.Username;
+    this.playcount = user.OverallPlaycount;
+  }
+
+  /**
+   * Converts this instance to a full `DroidUser` instance.
+   */
+  async toDroidUser(): Promise<DroidUser> {
+    return DroidUser.fromLeaderboardUser(this);
+  }
+}
+
+/**
+ * A class representing a user in the main server's score leaderboard.
+ */
+export class ScoreLBDroidUser extends LBDroidUser {
+  /**
+   * The user's total score.
+   */
+  score: number;
+
+  constructor(user: ScoreLeaderboardUser) {
+    super(user);
+    this.score = user.OverallScore;
+  }
+}
+
+/**
+ * A class representing a user in the main server's performance points leaderboard.
+ */
+export class PPLBDroidUser extends LBDroidUser {
+  /**
+   * The user's total performance points.
+   */
+  pp: number;
+
+  constructor(user: PPLeaderboardUser) {
+    super(user);
+    this.pp = user.OverallPP;
   }
 }
