@@ -22,6 +22,10 @@ export interface DroidUserScores {
  */
 export class DroidUser extends User {
   /**
+   * The user's banner URL.
+   */
+  banner_url: string | null;
+  /**
    * The `Date` the user was registered.
    */
   registered_at: Date;
@@ -80,8 +84,8 @@ export class DroidUser extends User {
     super({
       id: UserId,
       username: Username,
-      avatar_url: `https://osudroid.moe/user/avatar/${UserId}.png`,
       country: Region,
+      avatar_url: `https://osudroid.moe/user/avatar/${UserId}.png`,
       url: `https://osudroid.moe/profile.php?uid=${UserId}`,
       statistics: {
         rank: { global: GlobalRank, country: CountryRank },
@@ -91,6 +95,7 @@ export class DroidUser extends User {
         accuracy: OverallAccuracy,
       },
     });
+    this.banner_url = `https://osudroid.moe/user/banner/${UserId}.png`;
     this.registered_at = new Date(Registered);
     this.last_login = new Date(LastLogin);
     this.supporter = Boolean(Supporter);
@@ -117,26 +122,29 @@ export class DroidUser extends User {
   /**
    * Get a `DroidUser` instance, containing their information and scores.
    * @param user The user's ID or username.
-   * @param check_avatar_url Whether to validate the user's avatar URL or not. Defaults to `true`.
+   * @param validateURLs If `true`, validates the user's avatar and banner URLs with 2 additional HEAD requests. Otherwise, keeps the formatted URLs without checking. Defaults to `true`.
    */
-  static async get(user: number | string, check_avatar_url: boolean = true): Promise<DroidUser | undefined> {
+  static async get(user: number | string, validateURLs: boolean = true): Promise<DroidUser | undefined> {
     const response = await DroidAPI.getUser(user);
     if (!response) return undefined;
 
     const u = new DroidUser(response);
-    if (check_avatar_url) await u.validateAvatarURL();
+    if (validateURLs) {
+      if (!(await u.validateURL(u.avatar_url))) u.avatar_url = 'https://osu.ppy.sh/images/layout/avatar-guest@2x.png';
+      if (!(await u.validateURL(u.banner_url!))) u.banner_url = null;
+    }
     return u;
   }
 
   /**
-   * Validates the user's avatar URL. Falls back to the default avatar if 404 or unreachable.
+   * Makes a HEAD request to the URL and returns `true` if the response status is 200.
    */
-  private async validateAvatarURL(): Promise<void> {
+  private async validateURL(url: string): Promise<boolean> {
     try {
-      const response = await fetch(this.avatar_url, { method: 'HEAD' });
-      if (response.status == 200) return;
+      const response = await fetch(url, { method: 'HEAD' });
+      if (response.status == 200) return true;
     } catch {}
-    this.avatar_url = 'https://osu.ppy.sh/images/layout/avatar-guest@2x.png';
+    return false;
   }
 
   /**

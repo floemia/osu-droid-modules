@@ -62,16 +62,14 @@ export class User {
   username: string;
 
   /**
-   * The user's hypothetical avatar URL.
-   *
-   * If the user has no avatar, the URL will be invalid. Proceed with caution.
-   */
-  avatar_url: string;
-
-  /**
    * The user's country.
    */
   country: string | null;
+
+  /**
+   * The user's avatar URL.
+   */
+  avatar_url: string;
 
   /**
    * The user's page URL.
