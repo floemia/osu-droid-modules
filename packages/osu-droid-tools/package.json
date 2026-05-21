@@ -1,6 +1,6 @@
 {
   "name": "@floemia/osu-droid-tools",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A module that turns osu!droid Public API responses into functional instances.",
   "homepage": "https://github.com/floemia/osu-droid-modules/tree/master/packages/osu-droid-tools",
   "main": "dist/index.js",
