@@ -31,7 +31,6 @@ export abstract class DroidAPI {
    * @param suffix The suffix of the URL.
    */
   private static async call(suffix: string): Promise<Response | undefined> {
-    console.log(this.BASE_URL + suffix);
     const response = await fetch(this.BASE_URL + suffix);
     if (!response.ok) {
       if (response.status == 404) return undefined;
@@ -146,7 +145,6 @@ export abstract class DroidAPI {
    * @param params Configuration for the search request. See {@link SearchRequestParameters}.
    */
   static async scoreSearch(params: SearchRequestParameters): Promise<ScoreSearchResponse[]> {
-    if (!params) throw new Error('No parameters provided.');
     if (!params.user && !params.hash) throw new Error('No user or beatmap hash provided.');
     const { user, hash, order = 'score', page = 0 } = params;
 

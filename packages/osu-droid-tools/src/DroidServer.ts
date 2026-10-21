@@ -1,4 +1,9 @@
-import { DroidAPI, LeaderboardParameters } from '@floemia/osu-droid-api';
+import {
+  DroidAPI,
+  LeaderboardParameters,
+  OverallPPLeaderboardUser,
+  OverallScoreLeaderboardUser,
+} from '@floemia/osu-droid-api';
 import { MapLeaderboardParameters } from '@structures/parameters';
 import { DroidScore } from '~DroidScore';
 import { PPLBDroidUser, ScoreLBDroidUser } from '~DroidUser';
@@ -52,7 +57,9 @@ export abstract class DroidServer {
     const { limit = 50, page = 1, type = 'pp', region = 'all' } = params;
     const leaderboard = await DroidAPI.getLeaderboard({ limit, page, type, region });
     return leaderboard.Results.map((user) =>
-      type == 'pp' ? new PPLBDroidUser(user as PPLeaderboardUser) : new ScoreLBDroidUser(user as ScoreLeaderboardUser),
+      type == 'pp'
+        ? new PPLBDroidUser(user as OverallPPLeaderboardUser)
+        : new ScoreLBDroidUser(user as OverallScoreLeaderboardUser),
     ) as LBDroidUserType<T>[];
   }
 }
