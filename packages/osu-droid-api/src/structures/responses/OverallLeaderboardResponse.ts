@@ -1,4 +1,4 @@
-export interface LeaderboardUser {
+export interface OverallLeaderboardUser {
   /**
    * The user's ID.
    */
@@ -23,7 +23,7 @@ export interface LeaderboardUser {
 /**
  * A user in the `/leaderboard` endpoint if `type == 'score'`.
  */
-export interface ScoreLeaderboardUser extends LeaderboardUser {
+export interface OverallScoreLeaderboardUser extends OverallLeaderboardUser {
   /**
    * The user's overall score.
    */
@@ -33,7 +33,7 @@ export interface ScoreLeaderboardUser extends LeaderboardUser {
 /**
  * A user in the `/leaderboard` endpoint if `type == 'pp'`.
  */
-export interface PPLeaderboardUser extends LeaderboardUser {
+export interface OverallPPLeaderboardUser extends OverallLeaderboardUser {
   /**
    * The user's overall PP.
    */
@@ -45,11 +45,11 @@ export interface PPLeaderboardUser extends LeaderboardUser {
  *
  * Contains users, sorted by their overall score or performance points.
  */
-export interface LeaderboardResponse<T extends PPLeaderboardUser | ScoreLeaderboardUser> {
+export interface LeaderboardResponse<T extends OverallPPLeaderboardUser | OverallScoreLeaderboardUser> {
   /**
    * The users in the score / pp leaderboard.
    */
-  Results: T extends ScoreLeaderboardUser ? ScoreLeaderboardUser[] : PPLeaderboardUser[];
+  Results: T extends OverallScoreLeaderboardUser ? OverallScoreLeaderboardUser[] : OverallPPLeaderboardUser[];
 
   /**
    * The total number of pages.

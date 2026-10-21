@@ -1,4 +1,4 @@
-import { DroidAPI, LeaderboardParameters, PPLeaderboardUser, ScoreLeaderboardUser } from '@floemia/osu-droid-api';
+import { DroidAPI, LeaderboardParameters } from '@floemia/osu-droid-api';
 import { MapLeaderboardParameters } from '@structures/parameters';
 import { DroidScore } from '~DroidScore';
 import { PPLBDroidUser, ScoreLBDroidUser } from '~DroidUser';

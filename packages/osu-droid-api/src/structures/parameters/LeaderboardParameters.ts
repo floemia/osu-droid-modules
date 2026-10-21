@@ -1,4 +1,4 @@
-import { PPLeaderboardUser, ScoreLeaderboardUser } from '@structures/responses';
+import { OverallPPLeaderboardUser, OverallScoreLeaderboardUser } from '@structures/responses';
 
 /**
  * The type of leaderboard.
@@ -8,7 +8,9 @@ export type LeaderboardType = 'pp' | 'score';
 /**
  * The type of leaderboard user.
  */
-export type LeaderboardUserType<T extends LeaderboardType> = T extends 'pp' ? PPLeaderboardUser : ScoreLeaderboardUser;
+export type LeaderboardUserType<T extends LeaderboardType> = T extends 'pp'
+  ? OverallPPLeaderboardUser
+  : OverallScoreLeaderboardUser;
 
 /**
  * Parameters for the `/leaderboard/` endpoint.

@@ -82,6 +82,11 @@ export interface UserResponse {
   Contributor: number;
 
   /**
+   * The banner's MD5 hash.
+   */
+  BannerHash: string;
+
+  /**
    * The user's top 50 scores, sorted by highest PP.
    */
   Top50Plays: ScoreResponse[];

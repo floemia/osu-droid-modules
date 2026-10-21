@@ -1,4 +1,10 @@
-import { DroidAPI, PPLeaderboardUser, ScoreLeaderboardUser, ScoreResponse, UserResponse } from '@floemia/osu-droid-api';
+import {
+  DroidAPI,
+  OverallPPLeaderboardUser,
+  OverallScoreLeaderboardUser,
+  ScoreResponse,
+  UserResponse,
+} from '@floemia/osu-droid-api';
 import { User } from '@floemia/osu-droid-base';
 import { UserScoreSearchParameters } from '@structures/parameters';
 import { DroidScore } from '~DroidScore';
@@ -21,10 +27,6 @@ export interface DroidUserScores {
  * A class representing an osu!droid user from the main server.
  */
 export class DroidUser extends User {
-  /**
-   * The user's banner URL.
-   */
-  banner_url: string | null;
   /**
    * The `Date` the user was registered.
    */
@@ -60,6 +62,11 @@ export class DroidUser extends User {
    */
   scores: DroidUserScores;
 
+  /**
+   * The user's page new URL (`new.osudroid.moe`)
+   */
+  new_url: string;
+
   private constructor(response: UserResponse) {
     const {
       UserId,
@@ -85,7 +92,7 @@ export class DroidUser extends User {
       id: UserId,
       username: Username,
       country: Region,
-      avatar_url: `https://osudroid.moe/user/avatar/${UserId}.png`,
+      avatar_url: `https://new.osudroid.moe/api2/frontend/avatar/userid/${UserId}`,
       url: `https://osudroid.moe/profile.php?uid=${UserId}`,
       statistics: {
         rank: { global: GlobalRank, country: CountryRank },
@@ -95,7 +102,7 @@ export class DroidUser extends User {
         accuracy: OverallAccuracy,
       },
     });
-    this.banner_url = `https://osudroid.moe/user/banner/${UserId}.png`;
+    this.new_url = `https://new.osudroid.moe/profile/${UserId}`;
     this.registered_at = new Date(Registered);
     this.last_login = new Date(LastLogin);
     this.supporter = Boolean(Supporter);
@@ -122,29 +129,12 @@ export class DroidUser extends User {
   /**
    * Get a `DroidUser` instance, containing their information and scores.
    * @param user The user's ID or username.
-   * @param validateURLs If `true`, validates the user's avatar and banner URLs with 2 additional HEAD requests. Otherwise, keeps the formatted URLs without checking. Defaults to `true`.
    */
-  static async get(user: number | string, validateURLs: boolean = true): Promise<DroidUser | undefined> {
+  static async get(user: number | string): Promise<DroidUser | undefined> {
     const response = await DroidAPI.getUser(user);
     if (!response) return undefined;
 
-    const u = new DroidUser(response);
-    if (validateURLs) {
-      if (!(await u.validateURL(u.avatar_url))) u.avatar_url = 'https://osu.ppy.sh/images/layout/avatar-guest@2x.png';
-      if (!(await u.validateURL(u.banner_url!))) u.banner_url = null;
-    }
-    return u;
-  }
-
-  /**
-   * Makes a HEAD request to the URL and returns `true` if the response status is 200.
-   */
-  private async validateURL(url: string): Promise<boolean> {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      if (response.status == 200) return true;
-    } catch {}
-    return false;
+    return new DroidUser(response);
   }
 
   /**
@@ -177,7 +167,7 @@ export class LBDroidUser {
    */
   playcount: number;
 
-  constructor(user: ScoreLeaderboardUser | PPLeaderboardUser) {
+  constructor(user: OverallScoreLeaderboardUser | OverallPPLeaderboardUser) {
     this.id = user.UserId;
     this.username = user.Username;
     this.playcount = user.OverallPlaycount;
@@ -200,7 +190,7 @@ export class ScoreLBDroidUser extends LBDroidUser {
    */
   score: number;
 
-  constructor(user: ScoreLeaderboardUser) {
+  constructor(user: OverallScoreLeaderboardUser) {
     super(user);
     this.score = user.OverallScore;
   }
@@ -215,7 +205,7 @@ export class PPLBDroidUser extends LBDroidUser {
    */
   pp: number;
 
-  constructor(user: PPLeaderboardUser) {
+  constructor(user: OverallPPLeaderboardUser) {
     super(user);
     this.pp = user.OverallPP;
   }

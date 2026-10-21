@@ -2,15 +2,16 @@ import {
   LeaderboardParameters,
   LeaderboardType,
   LeaderboardUserType,
+  MapLeaderboardParameters,
   SearchRequestParameters,
 } from '@structures/parameters';
 import {
   ActivityFeedResponse,
-  AvatarHashesResponse,
   LeaderboardResponse,
+  MapLeaderboardResponse,
   OnlineStatsResponse,
-  PPLeaderboardUser,
-  ScoreLeaderboardUser,
+  OverallPPLeaderboardUser,
+  OverallScoreLeaderboardUser,
   ScoreSearchResponse,
   SpecialUsersResponse,
   UserResponse,
@@ -23,13 +24,14 @@ export abstract class DroidAPI {
   /**
    * The base url of the osu!droid API.
    */
-  static readonly BASE_URL = 'https://new.osudroid.moe/api2/frontend';
+  static readonly BASE_URL = 'https://new.osudroid.moe/api2/';
 
   /**
    * Basic fetch method with `BASE_URL` as prefix. Returns `undefined` if 404.
    * @param suffix The suffix of the URL.
    */
   private static async call(suffix: string): Promise<Response | undefined> {
+    console.log(this.BASE_URL + suffix);
     const response = await fetch(this.BASE_URL + suffix);
     if (!response.ok) {
       if (response.status == 404) return undefined;
@@ -65,7 +67,7 @@ export abstract class DroidAPI {
    * @param user The user's ID or username.
    */
   static async getUser(user: number | string): Promise<UserResponse | undefined> {
-    return this.getJSON(typeof user == 'string' ? `/profile-username/${user}` : `/profile-uid/${user}`);
+    return this.getJSON(typeof user == 'string' ? `frontend/profile-username/${user}` : `frontend/profile-uid/${user}`);
   }
 
   /**
@@ -74,7 +76,7 @@ export abstract class DroidAPI {
    */
   static async getLeaderboard<T extends LeaderboardType>(
     params: Omit<LeaderboardParameters, 'type'> & { type?: 'pp' },
-  ): Promise<LeaderboardResponse<PPLeaderboardUser>>;
+  ): Promise<LeaderboardResponse<OverallPPLeaderboardUser>>;
 
   /**
    * Requests a score leaderboard (`/leaderboard`).
@@ -82,7 +84,7 @@ export abstract class DroidAPI {
    */
   static async getLeaderboard<T extends LeaderboardType>(
     params: Omit<LeaderboardParameters, 'type'> & { type: 'score' },
-  ): Promise<LeaderboardResponse<ScoreLeaderboardUser>>;
+  ): Promise<LeaderboardResponse<OverallScoreLeaderboardUser>>;
 
   /**
    * Requests a score or performance points leaderboard (`/leaderboard`).
@@ -93,8 +95,9 @@ export abstract class DroidAPI {
   ): Promise<LeaderboardResponse<LeaderboardUserType<T>>>;
 
   static async getLeaderboard<T extends LeaderboardType>(
-    params: LeaderboardParameters,
+    params?: LeaderboardParameters,
   ): Promise<LeaderboardResponse<LeaderboardUserType<T>>> {
+    if (!params) params = { limit: 50, page: 1, type: 'pp', region: 'all' };
     const { limit = 50, page = 1, type = 'pp', region = 'all' } = params;
 
     if (limit > 50 || limit < 1) throw new Error('Limit must be between 1 and 50.');
@@ -102,48 +105,38 @@ export abstract class DroidAPI {
     if (region != 'all' && region.length != 2)
       throw new Error('Invalid country code provided. Must be ISO 3166-1 alpha-2 compliant.');
 
-    return this.getJSON(`/leaderboard/type=${type}/region=${region}/page=${page}/limit=${limit}`);
+    return this.getJSON(`frontend/leaderboard/type=${type}/region=${region}/page=${page}/limit=${limit}`);
+  }
+
+  /**
+   * Requests the leaderboard of a beatmap (`/game/leaderboard`).
+   * @param params Configuration for the beatmap leaderboard request. See {@link MapLeaderboardParameters}
+   */
+  static async getMapLeaderboard(params: MapLeaderboardParameters): Promise<MapLeaderboardResponse> {
+    const { type = 'score', hash, uid } = params;
+    let suffix = `game/leaderboard/?hash=${hash}`;
+    if (type) suffix += `&type=${type}`;
+    if (uid) suffix += `&uid=${uid}`;
+    return this.getJSON(suffix);
   }
 
   /**
    * Requests the default avatar (`/avatar/default`).
-   * @param size Must be between 64 and 256. Defaults to 128.
+   * @param size Must be less than or equal to 512. Defaults to 256.
    */
-  static async getDefaultAvatar(size: number = 128): Promise<ArrayBuffer> {
-    if (size < 64 || size > 256) throw new Error('Size must be between 64 and 256.');
-    return this.getArrayBuffer(`/avatar/default?size=${size}`) as Promise<ArrayBuffer>;
+  static async getDefaultAvatar(size: number = 256): Promise<ArrayBuffer> {
+    if (size < 0 || size > 256) throw new Error('Size must be between 0 and 512 pixels.');
+    return this.getArrayBuffer(`frontend/avatar/default?size=${size}`) as Promise<ArrayBuffer>;
   }
 
   /**
    * Requests the avatar of a user (`/avatar/userid`).
    * @param id The user's ID.
-   * @param size The size in px of the avatar (64-256). Defaults to 128.
+   * @param size Must be less than or equal to 512. Defaults to 256.
    */
-  static async getAvatar(id: number, size: number = 128): Promise<ArrayBuffer | undefined> {
-    if (size < 64 || size > 256) throw new Error('Size must be between 64 and 256.');
-    return this.getArrayBuffer(`/avatar/userid/${id}?size=${size}`);
-  }
-
-  /**
-   * Requests an avatar by its SHA-512 hash. (`/avatar/hash`)
-   * @param params Configuration for the avatar request. See {@link AvatarByHashParameters}.
-   */
-  static async getAvatarByHash(hash: string, size: number = 128): Promise<ArrayBuffer | undefined> {
-    if (size < 64 || size > 256) throw new Error('Size must be between 64 and 256.');
-    return this.getArrayBuffer(`/avatar/hash/${hash}?size=${size}`);
-  }
-
-  /**
-   * Requests a list of avatars and their SHA-512 hashes by their user IDs (`/avatar/hashes/userids`).
-   * @param ids The user IDs. Can be a single ID or an array of IDs. Length must be between 1 and 100.
-   * @param size The size in px of the avatars (64-256). Defaults to 128.
-   */
-  static async getAvatarHashesByIDs(ids: number | number[], size: number = 128): Promise<AvatarHashesResponse> {
-    if (typeof ids == 'number') ids = [ids];
-    if (size < 64 || size > 256) throw new Error('Size must be between 64 and 256.');
-    if (ids.length < 1 || ids.length > 100) throw new Error('IDs must be between 1 and 100.');
-
-    return this.getJSON(`/avatar/hashes/${ids.join(',')}?size=${size}`);
+  static async getAvatar(id: number, size: number = 256): Promise<ArrayBuffer | undefined> {
+    if (size < 0 || size > 256) throw new Error('Size must be between 0 and 512 pixels.');
+    return this.getArrayBuffer(`frontend/avatar/userid/${id}?size=${size}`);
   }
 
   /**
@@ -158,7 +151,7 @@ export abstract class DroidAPI {
     const { user, hash, order = 'score', page = 0 } = params;
 
     if (page && page < 0) throw new Error('Page must be greater than or equal to 0.');
-    let suffix = `/score-search?${user ? (typeof user == 'string' ? `username=${user}` : `uid=${user}`) : ''}`;
+    let suffix = `frontend/score-search?${user ? (typeof user == 'string' ? `username=${user}` : `uid=${user}`) : ''}`;
     if (hash) suffix += `&hash=${hash}`;
     suffix += `&order=${order}`;
     if (page) suffix += `&page=${page}`;
@@ -172,20 +165,20 @@ export abstract class DroidAPI {
    * **Limited to 20 requests per minute. Excludes restricted, archived and banned users.**
    */
   static async getActivityFeed(): Promise<ActivityFeedResponse> {
-    return this.getJSON('/activity-feed');
+    return this.getJSON('frontend/activity-feed');
   }
 
   /**
    * Requests the current server's online statistics (`/online-stats`).
    */
   static async getOnlineStats(): Promise<OnlineStatsResponse> {
-    return this.getJSON('/online-stats');
+    return this.getJSON('frontend/online-stats');
   }
 
   /**
    * Requests the list of developers, contributors and supporters (`/special-users`).
    */
   static async getSpecialUsers(): Promise<SpecialUsersResponse[]> {
-    return this.getJSON('/special-users');
+    return this.getJSON('frontend/special-users');
   }
 }
