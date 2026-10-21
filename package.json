@@ -4,6 +4,7 @@
     "build": "lerna run build",
     "publish": "lerna publish",
     "format": "prettier --write \"packages/**/*.ts\"",
+    "update-packages": "lerna run update-pp --scope='{@floemia/osu-droid-tools,@floemia/osu-droid-base}'",
     "format:check": "prettier --check \"packages/**/*.ts\""
   },
   "devDependencies": {

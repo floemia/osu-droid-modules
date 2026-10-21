@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "homepage": "https://github.com/floemia/osu-droid-modules/tree/master/packages/osu-droid-base",
   "scripts": {
-    "build": "tsdown src/index.ts --clean"
+    "build": "tsdown src/index.ts --clean",
+    "update-pp": "npm i @rian8337/osu-base@beta @rian8337/osu-difficulty-calculator@beta @rian8337/osu-droid-replay-analyzer@beta"
   },
   "keywords": [
     "osu-droid",
@@ -33,8 +34,8 @@
   "gitHead": "1dd5a3734d07a106e9db60703817d110328bc0a7",
   "dependencies": {
     "@floemia/osu-droid-api": "^0.4.0",
-    "@rian8337/osu-base": "^4.0.0-beta.87",
-    "@rian8337/osu-difficulty-calculator": "^4.0.0-beta.87",
-    "@rian8337/osu-droid-replay-analyzer": "^4.0.0-beta.87"
+    "@rian8337/osu-base": "^4.0.0-beta.102",
+    "@rian8337/osu-difficulty-calculator": "^4.0.0-beta.102",
+    "@rian8337/osu-droid-replay-analyzer": "^4.0.0-beta.102"
   }
 }
