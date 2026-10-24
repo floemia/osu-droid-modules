@@ -1,4 +1,4 @@
-import { Accuracy, MapInfo, ModMap, ScoreRank, SerializedMod } from '@rian8337/osu-base';
+import { Accuracy, Beatmap, MapInfo, ModMap, ScoreRank, SerializedMod } from '@rian8337/osu-base';
 
 /**
  * Parameters for creating a generic osu!droid score.
@@ -102,5 +102,5 @@ export interface ScoreCreationParameters {
   /**
    * The beatmap of the score.
    */
-  beatmapOrHash?: MapInfo<true> | string;
+  beatmapOrHash?: MapInfo<true> | Beatmap | string;
 }

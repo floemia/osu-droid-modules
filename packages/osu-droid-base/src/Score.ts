@@ -1,4 +1,4 @@
-import { Accuracy, MapInfo, ModMap, ModRateAdjust, ModUtil, ScoreRank } from '@rian8337/osu-base';
+import { Accuracy, Beatmap, MapInfo, ModMap, ModRateAdjust, ModUtil, ScoreRank } from '@rian8337/osu-base';
 import {
   DroidDifficultyCalculator,
   DroidPerformanceCalculator,
@@ -10,7 +10,6 @@ import {
   OsuPerformanceCalculator,
   PerformanceCalculationOptions,
 } from '@rian8337/osu-difficulty-calculator';
-import { ReplayAnalyzer } from '@rian8337/osu-droid-replay-analyzer';
 import { ScoreCreationParameters } from '@structures/parameters';
 
 /**
@@ -107,7 +106,20 @@ export class Score {
    *
    * Available by calling `getBeatmap()` if the beatmap exists.
    */
-  beatmap: MapInfo | undefined;
+  beatmap: Beatmap | null;
+
+  /**
+   * Information of the beatmap.
+   *
+   * Available by calling `getBeatmap()` if the beatmap exists.
+   */
+  map_info: MapInfo<boolean> | undefined;
+
+  private checked: boolean = false;
+  private osu_diff: OsuDifficultyAttributes | undefined;
+  private droid_diff: ExtendedDroidDifficultyAttributes | undefined;
+  private osu_perf: IDroidPerformanceAttributes | undefined;
+  private droid_perf: IOsuPerformanceAttributes | undefined;
 
   constructor(input: ScoreCreationParameters) {
     const {
@@ -141,12 +153,16 @@ export class Score {
     if (mods instanceof ModMap) this.mods = mods;
     else if (Array.isArray(mods)) this.mods = ModUtil.deserializeMods(mods);
     else this.mods = ModUtil.pcStringToMods(mods ?? '');
-    if (beatmapOrHash instanceof MapInfo) {
-      this.hash = beatmapOrHash.hash;
+    if (beatmapOrHash instanceof Beatmap) {
       this.beatmap = beatmapOrHash;
+      this.hash = '';
+    } else if (beatmapOrHash instanceof MapInfo) {
+      this.hash = beatmapOrHash.hash;
+      this.map_info = beatmapOrHash;
+      this.beatmap = beatmapOrHash.beatmap;
     } else {
       this.hash = beatmapOrHash ?? '';
-      this.beatmap = undefined;
+      this.beatmap = null;
     }
   }
 
@@ -171,57 +187,89 @@ export class Score {
   }
 
   /**
-   * Gets the beatmap of this score.
+   * Gets information of the beatmap.
+   *
+   * @param downloadBeatmap Downloads the .osu file and decodes the data to `this.beatmap`. Defaults to `true`.
    */
-  async getBeatmap(): Promise<MapInfo<true> | undefined> {
-    if (this.beatmap) return this.beatmap;
-    const map = await MapInfo.getInformation(this.hash);
-    if (!map) return undefined;
-
-    this.beatmap = map;
-    return map;
+  async getMapInfo(downloadBeatmap: boolean = true): Promise<MapInfo<boolean> | undefined> {
+    const data = await MapInfo.getInformation(this.hash, downloadBeatmap);
+    if (downloadBeatmap) this.checked = true;
+    if (!data) return undefined;
+    this.map_info = data;
+    this.beatmap = data.beatmap;
+    return this.map_info;
   }
+
+  /**
+   * Requests full beatmap info,
+   */
+  async getBeatmap(): Promise<Beatmap | null> {
+    if (this.beatmap || this.checked == true) return this.beatmap;
+    await this.getMapInfo();
+    return this.beatmap;
+  }
+
+  /**
+   * Calculates the difficulty values of this score, using the osu!droid difficulty system.
+   **/
+  async calculateDifficulty(mode?: 'droid'): Promise<ExtendedDroidDifficultyAttributes | undefined>;
+
+  /**
+   * Calculates the difficulty values of this score, using the osu! difficulty system.
+   **/
+  async calculateDifficulty(mode: 'osu'): Promise<OsuDifficultyAttributes | undefined>;
+
+  /**
+   * Calculates the difficulty values of this score, using the osu!droid or osu! difficulty system.
+   * @param mode The system to use. Defaults to `droid`.
+   */
+  async calculateDifficulty(
+    mode: Mode,
+  ): Promise<OsuDifficultyAttributes | ExtendedDroidDifficultyAttributes | undefined>;
+
+  async calculateDifficulty<T extends Mode = 'droid'>(
+    mode: Mode = 'droid' as T,
+  ): Promise<OsuDifficultyAttributes | ExtendedDroidDifficultyAttributes | undefined> {
+    const isDroid = mode == 'droid';
+    const cached_rating = isDroid ? this.droid_diff : this.osu_diff;
+    if (cached_rating) return cached_rating;
+
+    const map = await this.getBeatmap();
+    if (!map) return undefined;
+    const diff_calculator = isDroid ? new DroidDifficultyCalculator() : new OsuDifficultyCalculator();
+    return diff_calculator.calculate(map, this.mods);
+  }
+
   /**
    * Calculates the performance values of this score, using the osu!droid PP system.
    **/
-  async calculate(mode?: 'droid'): Promise<IDroidPerformanceAttributes | undefined>;
+  async calculatePerformance(mode?: 'droid'): Promise<IDroidPerformanceAttributes | undefined>;
 
   /**
    * Calculates the performance values of this score, using the osu! PP system.
    **/
-  async calculate(mode: 'osu'): Promise<IOsuPerformanceAttributes | undefined>;
+  async calculatePerformance(mode: 'osu'): Promise<IOsuPerformanceAttributes | undefined>;
 
   /**
    * Calculates the performance values of this score, using the osu!droid or osu! PP system.
    * @param mode The system to use. Defaults to `droid`.
    */
-  async calculate(mode: Mode): Promise<IOsuPerformanceAttributes | IDroidPerformanceAttributes | undefined>;
+  async calculatePerformance(mode: Mode): Promise<IOsuPerformanceAttributes | IDroidPerformanceAttributes | undefined>;
 
-  async calculate<T extends Mode = 'droid'>(
+  async calculatePerformance<T extends Mode = 'droid'>(
     mode: T = 'droid' as T,
   ): Promise<IOsuPerformanceAttributes | IDroidPerformanceAttributes | undefined> {
-    let replay;
-    if ((this as any).replay && (this as any).replay instanceof ReplayAnalyzer) replay = (this as any).replay;
     const isDroid = mode == 'droid';
-    const map = await this.getBeatmap();
-    if (!map) return undefined;
-
-    const sliderEnds = map.beatmap.hitObjects.sliderEnds;
-    const sliderTicks = map.beatmap.hitObjects.sliderTicks;
+    const cached_perf = isDroid ? this.droid_perf : this.osu_perf;
+    if (cached_perf) return cached_perf;
+    const rating = await this.calculateDifficulty(mode);
+    if (!rating) return;
     const calc_options: PerformanceCalculationOptions = {
       accPercent: this.accuracy,
       combo: this.max_combo,
-      sliderEndsDropped: this.slider_end_hits ? sliderEnds - this.slider_end_hits : 0,
-      sliderTicksMissed: this.slider_tick_hits ? sliderTicks - this.slider_tick_hits : 0,
-      ...(replay && {
-        aimSliderCheesePenalty: replay.sliderCheesePenalty.aimPenalty,
-        flashlightSliderCheesePenalty: replay.sliderCheesePenalty.flashlightPenalty,
-        tapPenalty: replay.tapPenalty,
-      }),
+      totalScore: this.total_score,
     };
 
-    const diff_calculator = isDroid ? new DroidDifficultyCalculator() : new OsuDifficultyCalculator();
-    const rating = diff_calculator.calculate(map.beatmap, this.mods);
     const perf_calculator = isDroid
       ? new DroidPerformanceCalculator(rating as ExtendedDroidDifficultyAttributes)
       : new OsuPerformanceCalculator(rating as OsuDifficultyAttributes);
