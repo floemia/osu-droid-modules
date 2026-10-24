@@ -115,6 +115,9 @@ export class Score {
    */
   map_info: MapInfo<boolean> | undefined;
 
+  /**
+   * Set to true if this.getBeatmap() was called.
+   */
   private checked: boolean = false;
   private osu_diff: OsuDifficultyAttributes | undefined;
   private droid_diff: ExtendedDroidDifficultyAttributes | undefined;
