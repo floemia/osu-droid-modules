@@ -1,6 +1,6 @@
 {
   "name": "@floemia/osu-droid-base",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Base classes and methods for my osu!droid modules.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -33,7 +33,7 @@
   },
   "gitHead": "db82aac8b757122df4fa9e946081f47d4777d7f0",
   "dependencies": {
-    "@floemia/osu-droid-api": "^0.4.6",
+    "@floemia/osu-droid-api": "^0.4.7",
     "@rian8337/osu-base": "^4.0.0-beta.102",
     "@rian8337/osu-difficulty-calculator": "^4.0.0-beta.102",
     "@rian8337/osu-droid-replay-analyzer": "^4.0.0-beta.102"
