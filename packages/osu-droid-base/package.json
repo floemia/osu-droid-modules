@@ -31,7 +31,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "5113b9ff99283a3a19cd5368d7690816635b6ba9",
+  "gitHead": "2490f70f99885a3444b805cbb08d5f7347e05621",
   "dependencies": {
     "@floemia/osu-droid-api": "^0.4.0",
     "@rian8337/osu-base": "^4.0.0-beta.102",

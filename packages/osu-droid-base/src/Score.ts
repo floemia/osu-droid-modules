@@ -201,7 +201,7 @@ export class Score {
   }
 
   /**
-   * Requests full beatmap info,
+   * Requests the beatmap this score was set on.
    */
   async getBeatmap(): Promise<Beatmap | null> {
     if (this.beatmap || this.checked == true) return this.beatmap;
