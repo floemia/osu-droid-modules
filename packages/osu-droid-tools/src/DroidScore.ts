@@ -112,7 +112,7 @@ export class DroidScore extends Score {
     if (this.replay) return this.replay;
     const map = await this.getBeatmap();
     if (!map) return undefined;
-    this.replay = new ReplayAnalyzer({ scoreID: this.id, map: map.beatmap });
+    this.replay = new ReplayAnalyzer({ scoreID: this.id, map: map });
     return this.replay.analyze();
   }
 
