@@ -4,7 +4,7 @@ generate a profile card from an osu!droid user with the help of [@floemia/osu-dr
 
 ## requirements
 
-- an osu!api v1 key. request one [here](https://osu.ppy.sh/home/account/edit#legacy-api).
+- an osu!api v1 key. request one [here](https://osu.ppy.sh/home/account/edit#legacy-api). the requested beatmaps are cached internally to avoid unnecesary requests.
 
 ## installation
 
