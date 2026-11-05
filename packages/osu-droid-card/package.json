@@ -1,0 +1,38 @@
+{
+  "name": "@floemia/osu-droid-card",
+  "version": "0.4.8",
+  "description": "A module that creates a profile card of an osu!droid user.",
+  "homepage": "https://github.com/floemia/osu-droid-modules/tree/master/packages/osu-droid-card",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsdown src/index.ts --clean"
+  },
+  "keywords": [
+    "osu",
+    "osu-droid",
+    "profile-card"
+  ],
+  "author": "floemia",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/floemia/osu-droid-modules.git"
+  },
+  "bugs": {
+    "url": "https://github.com/floemia/osu-droid-modules/issues"
+  },
+  "type": "commonjs",
+  "files": [
+    "dist",
+    "assets"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@floemia/osu-droid-base": "^0.4.8",
+    "@rian8337/osu-base": "^4.0.0-beta.103"
+  },
+  "gitHead": "8d3a1ade34714d3d9970ecdc7c8a0f9975a1b9cd"
+}

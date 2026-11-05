@@ -8,7 +8,7 @@
     "format:check": "prettier --check \"packages/**/*.ts\""
   },
   "devDependencies": {
-    "@types/node": "^25.6.2",
+    "@types/node": "^25.9.9",
     "dotenv": "^17.4.2",
     "lerna": "^9.0.7",
     "prettier": "3.8.3",
@@ -20,6 +20,10 @@
     "packages/osu-droid-rx-api",
     "packages/osu-droid-api",
     "packages/osu-droid-tools",
-    "packages/osu-droid-base"
-  ]
+    "packages/osu-droid-base",
+    "packages/osu-droid-card"
+  ],
+  "dependencies": {
+    "@napi-rs/canvas": "^1.1.0"
+  }
 }
