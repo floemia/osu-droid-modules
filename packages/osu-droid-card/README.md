@@ -32,8 +32,4 @@ writeFileSync(`${user.id}.png`, buffer);
 
 ## examples
 
-<img height="250" alt="image" src="./examples/floemiauwu.png" />
-<img height="250" alt="image" src="./examples/John_Droid.png" />
-<img height="250" alt="image" src="./examples/Kyshi.png" />
-<img height="250" alt="image" src="./examples/Talentless.png" />
-<img height="250" alt="image" src="./examples/bafplayer101.png" />
+<img height="250" alt="image" src="./examples/floemiauwu.png" /> <img height="250" alt="image" src="./examples/John_Droid.png" /> <img height="250" alt="image" src="./examples/Kyshi.png" /> <img height="250" alt="image" src="./examples/Talentless.png" /> <img height="250" alt="image" src="./examples/bafplayer101.png" /> <img height="250" alt="image" src="./examples/NotTiano99.png" />

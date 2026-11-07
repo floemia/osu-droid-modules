@@ -122,9 +122,9 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
   // draw background of second section
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
   const bg_x = 40;
-  const bg_y = 400;
+  const bg_y = 411;
   const bg_width = 1920;
-  const bg_height = 640;
+  const bg_height = 629;
   const bg_radius = 90;
   CanvasHelper.roundFillRect(ctx, bg_x, bg_y, bg_width, bg_height, bg_radius);
 
@@ -136,7 +136,7 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
   // CanvasHelper.roundFillRect(ctx, bg_x, bg_y, bg_width, bg_height, bg_radius);
 
   // draw avatar
-  CanvasHelper.drawRoundedImage(ctx, avatar, 80, 50, 300, 300, 60);
+  CanvasHelper.drawRoundedImage(ctx, avatar, 80, 50, 320, 320, 60);
 
   // shadow
   ctx.shadowBlur = 10;
@@ -147,16 +147,16 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
   ctx.fillStyle = accent;
   ctx.font = '100px Title';
 
-  ctx.fillText(user.username, 450, 90);
+  ctx.fillText(user.username, 470, 100);
 
   // draw flag and country
-  ctx.drawImage(flag, 450, 229, 80, 80);
+  ctx.drawImage(flag, 470, 239, 80, 80);
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '64px Subtitle';
   const country = user.country
     ? new Intl.DisplayNames(['en'], { type: 'region' }).of(user.country.toUpperCase())
     : 'Unknown';
-  ctx.fillText(country || 'Unknown', 560, 240);
+  ctx.fillText(country || 'Unknown', 580, 250);
 
   // draw rectangle of ranks and pp
   const ranking_x = 80;

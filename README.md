@@ -6,3 +6,4 @@
 | [`osu-droid-api`](./packages/osu-droid-api)       | A basic wrapper for the osu!droid Public API, written in TypeScript.          |
 | [`osu-droid-rx-api`](./packages/osu-droid-rx-api) | A basic wrapper for the osudroid!rx API, written in TypeScript.               |
 | [`osu-droid-tools`](./packages/osu-droid-tools)   | A module that turns osu!droid Public API responses into functional instances. |
+| [`osu-droid-card`](./packages/osu-droid-tools)    | A module that creates a profile card of an osu!droid user.                    |
