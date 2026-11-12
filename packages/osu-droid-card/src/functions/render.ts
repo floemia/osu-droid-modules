@@ -180,16 +180,17 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
   //   ranking_height,
   //   ranking_radius,
   // );
-  // get globe icon, tinted with the accent color
-  const globe = await CanvasHelper.tintImage(path.join(assets, './icons/global.png'), accent, 1);
+  // get earth emoji
+  const earth = await loadImage(path.join(assets, './icons/earth.png'));
 
   // rank display
-  // (globe icon) #(global rank) | (country icon) #(country rank)
+  // (earth emoji) #(global rank) | (country icon) #(country rank)
   const rank_top = 514;
   const rank_size = 55;
   const rank_middle = rank_top + rank_size / 2;
   const rank_gap = 30;
-  const rank_separator_gap = 30;
+  const rank_separator_gap = 40;
+  const rank_separator_width = 4;
   const rank_max_width = 500;
 
   const global_rank = user.statistics.rank.global ?? 0;
@@ -209,6 +210,7 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
 
   // shrink the font until the whole row fits in the available width
   let rank_font = 55;
+
   const measureRankRow = () => {
     ctx.font = `${rank_font}px Subtitle`;
     return (
@@ -216,7 +218,7 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
       rank_gap +
       ctx.measureText(global_text).width +
       rank_separator_gap +
-      ctx.measureText('|').width +
+      rank_separator_width +
       rank_separator_gap +
       rank_size +
       rank_gap +
@@ -228,9 +230,13 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
   ctx.textBaseline = 'middle';
   ctx.font = `${rank_font}px Title`;
 
+  const rank_separator_metrics = ctx.measureText('|');
+  const rank_separator_height =
+    rank_separator_metrics.actualBoundingBoxAscent + rank_separator_metrics.actualBoundingBoxDescent;
+
   let rank_x = 130;
-  // globe icon + global rank
-  ctx.drawImage(globe, rank_x, rank_top - 3, rank_size, rank_size);
+  // earth emoji + global rank
+  ctx.drawImage(earth, rank_x, rank_top - 3, rank_size, rank_size);
   rank_x += rank_size + rank_gap;
 
   ctx.fillStyle = '#FFFFFF';
@@ -247,9 +253,16 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
 
   if (user.country) {
     // separator
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.fillText('|', rank_x, rank_middle - 3);
-    rank_x += ctx.measureText('|').width + rank_separator_gap;
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    CanvasHelper.roundFillRect(
+      ctx,
+      rank_x,
+      rank_middle - rank_separator_height / 2,
+      rank_separator_width,
+      rank_separator_height,
+      rank_separator_width / 2,
+    );
+    rank_x += rank_separator_width + rank_separator_gap;
 
     // flag icon + country rank
     ctx.drawImage(flag, rank_x, rank_top - 5, rank_size + 5, rank_size + 5);
