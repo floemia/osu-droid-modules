@@ -71,6 +71,23 @@ async function getBeatmapCover(map: MapInfo | null) {
 }
 
 /**
+ * Loads the banner of a user, if they have one.
+ */
+async function getUserBanner(user_id: number): Promise<Image | null> {
+  try {
+    const response = await fetch(`https://new.osudroid.moe/api2/frontend/banner/userid/${user_id}`);
+    if (!response.ok) return null;
+
+    const content_type = response.headers.get('content-type') ?? '';
+    if (!content_type.startsWith('image/')) return null;
+
+    return await loadImage(Buffer.from(await response.arrayBuffer()));
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Loads a mod's icon, caching it by acronym.
  */
 async function getModIcon(mod: string) {
@@ -98,8 +115,11 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
   // get avatar
   const avatar = await loadImage(user.avatar_url);
 
-  // get accent color
-  const accent = await ColorHelper.getAccentColor(avatar);
+  // get banner, if the user has one
+  const banner = await getUserBanner(user.id);
+
+  // get accent color, preferring the banner over the avatar
+  const accent = await ColorHelper.getAccentColor(banner ?? avatar);
 
   // get bg
   const bg = await CanvasHelper.tintImage(
@@ -118,6 +138,25 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
 
   // draw background
   ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+  // replace the top half of the background with the banner, fading it out
+  if (banner) {
+    const banner_height = canvas.height / 2;
+    const banner_canvas = createCanvas(canvas.width, banner_height);
+    const banner_ctx = banner_canvas.getContext('2d');
+    banner_ctx.filter = 'blur(9px) brightness(50%)';
+    banner_ctx.drawImage(banner, -40, -40, canvas.width + 80, banner_height + 80);
+    banner_ctx.filter = 'none';
+
+    const banner_fade = banner_ctx.createLinearGradient(0, banner_height / 2, 0, banner_height);
+    banner_fade.addColorStop(0, 'rgba(0,0,0,1)');
+    banner_fade.addColorStop(1, 'rgba(0,0,0,0)');
+    banner_ctx.globalCompositeOperation = 'destination-in';
+    banner_ctx.fillStyle = banner_fade;
+    banner_ctx.fillRect(0, 0, canvas.width, banner_height);
+
+    ctx.drawImage(banner_canvas, 0, 0);
+  }
 
   // draw background of second section
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
@@ -472,7 +511,7 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
 
     if (cover) {
       // draw the cover blurred and slightly oversized to avoid transparent edges
-      ctx.filter = 'blur(10px) brightness(40%)';
+      ctx.filter = 'blur(10px) brightness(40%) saturate(40%)';
       ctx.globalAlpha = 0.9;
       ctx.drawImage(cover, card_x - 40, row_y - 40, card_width + 80, score_height + 80);
       ctx.filter = 'none';
@@ -532,23 +571,23 @@ export async function render(user: DroidUser, beatmaps?: MapInfo[]) {
 
     // beatmap title and difficulty
     const title = map_info?.title!;
-    const version = map_info?.version ?? '';
+    const version = map_info?.version!;
     ctx.save();
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
 
     ctx.font = '36px Title';
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(fitText(ctx, title, title_max_width), card_x + card_padding, row_y + 28);
+    ctx.fillText(fitText(ctx, title, title_max_width), card_x + card_padding, row_y + 24);
 
     ctx.font = '28px Subtitle';
     ctx.fillStyle = 'rgba(255,255,255,0.88)';
-    ctx.fillText(fitText(ctx, version, title_max_width), card_x + card_padding, row_y + 76);
+    ctx.fillText(fitText(ctx, version, title_max_width), card_x + card_padding, row_y + 72);
 
     // mod icons, below the difficulty
     const mod_icon_size = 44;
     const mod_gap = 8;
-    const mod_y = row_y + 115;
+    const mod_y = row_y + 111;
     let mod_x = card_x + card_padding;
 
     // i mean rv6 is nottttt a *mod* per se.............. right??
